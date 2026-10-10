@@ -1,0 +1,12 @@
+{
+  "name": "lifebridge-web-v2",
+  "version": "2.0.0",
+  "description": "LifeBridge — AI Life-Admin Agent Interactive Hackathon Demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["lifebridge", "hackathon", "demo"],
+  "author": "",
+  "license": "ISC"
+}

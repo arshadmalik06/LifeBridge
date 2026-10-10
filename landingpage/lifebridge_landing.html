@@ -1,0 +1,3940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeBridge — The AI Life OS for All Your Documents</title>
+  <meta name="description" content="ChatGPT tells you what a document says. LifeBridge tells you what to do with it. Turn confusing paperwork, government circulars, and medical reports into simple explanations, verified next steps, and automated reminders in your language." />
+  <meta property="og:title" content="LifeBridge — The AI Life OS for All Your Documents" />
+  <meta property="og:description" content="Never fight a PDF boss battle alone. LifeBridge transforms confusing official paperwork into actionable workflows, deadlines, and audio in 10+ Indian languages." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#FFF9EF" />
+
+  <!-- Google Fonts: Space Grotesk (display), Inter (body), JetBrains Mono (code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── DESIGN SYSTEM TOKENS ────────────────────────────────── */
+    :root {
+      --cream: #FFF9EF;
+      --cream-alt: #F6EFE2;
+      --cream-dark: #ECE3D2;
+      --deep-ink: #242127;
+      --ink-dim: #38343E;
+      --muted-text: #686671;
+      --muted-light: #9491A0;
+      --electric-purple: #7357E8;
+      --purple-hover: #5F42D6;
+      --purple-light: #8E77F0;
+      --purple-bg: #F4F0FF;
+      --acid-lime: #D8F56A;
+      --lime-dark: #C0DE46;
+      --soft-lavender: #EEE8FF;
+      --lavender-card: #F7F3FF;
+      --white: #FFFFFF;
+      --coral: #FF6B6B;
+      --emerald: #10B981;
+      --amber: #F59E0B;
+      --border-subtle: rgba(36, 33, 39, 0.10);
+      --border-dark: rgba(36, 33, 39, 0.20);
+      --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-xl: 32px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 2px 8px rgba(36, 33, 39, 0.05);
+      --shadow-md: 0 8px 24px rgba(36, 33, 39, 0.08);
+      --shadow-lg: 0 16px 42px rgba(36, 33, 39, 0.12);
+      --shadow-purple: 0 10px 30px rgba(115, 87, 232, 0.25);
+      --shadow-lime: 0 8px 20px rgba(216, 245, 106, 0.4);
+    }
+
+    /* ── BASE & RESET ────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      background-color: var(--cream);
+      color: var(--deep-ink);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    button, input, select {
+      font-family: inherit;
+    }
+    :focus-visible {
+      outline: 3px solid var(--electric-purple);
+      outline-offset: 3px;
+    }
+
+    /* ── LAYOUT & CONTAINERS ─────────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .container-wide {
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    section {
+      padding: 96px 0;
+      position: relative;
+    }
+
+    /* ── TYPOGRAPHY ─────────────────────────────────────────── */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--deep-ink);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--soft-lavender);
+      color: var(--electric-purple);
+      border: 1px solid rgba(115, 87, 232, 0.25);
+      margin-bottom: 20px;
+    }
+    .eyebrow-dark {
+      background: rgba(216, 245, 106, 0.15);
+      color: var(--acid-lime);
+      border-color: rgba(216, 245, 106, 0.35);
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+      animation: pulse 2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* ── BUTTONS ────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.96rem;
+      padding: 13px 26px;
+      border-radius: var(--radius-full);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-primary {
+      background: var(--electric-purple);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(115, 87, 232, 0.35);
+    }
+    .btn-primary:hover {
+      background: var(--purple-hover);
+      box-shadow: 0 8px 22px rgba(115, 87, 232, 0.45);
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--deep-ink);
+      border-color: var(--border-dark);
+    }
+    .btn-secondary:hover {
+      background: rgba(36, 33, 39, 0.05);
+      border-color: var(--deep-ink);
+      transform: translateY(-2px);
+    }
+    .btn-lime {
+      background: var(--acid-lime);
+      color: var(--deep-ink);
+      box-shadow: 0 4px 14px rgba(216, 245, 106, 0.35);
+    }
+    .btn-lime:hover {
+      background: var(--lime-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(216, 245, 106, 0.45);
+    }
+    .btn-white {
+      background: var(--white);
+      color: var(--deep-ink);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-white:hover {
+      background: var(--cream);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-sm {
+      padding: 8px 18px;
+      font-size: 0.86rem;
+    }
+
+    /* ── STICKY NAVIGATION ───────────────────────────────────── */
+    #navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 249, 239, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(255, 249, 239, 0.98);
+      border-bottom-color: var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
+      color: var(--deep-ink);
+    }
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      background: var(--electric-purple);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-weight: 800;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 8px rgba(115, 87, 232, 0.35);
+    }
+    .nav-tagline-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: var(--acid-lime);
+      color: var(--deep-ink);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(36, 33, 39, 0.15);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+    .nav-link {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--muted-text);
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover {
+      color: var(--deep-ink);
+    }
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--deep-ink);
+      border-radius: 2px;
+      transition: all 0.25s ease;
+    }
+    .nav-hamburger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+    .nav-hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+    .nav-hamburger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* Mobile drawer */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 72px;
+      left: 0;
+      width: 100%;
+      background: var(--cream);
+      border-bottom: 2px solid var(--border-subtle);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      z-index: 999;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .mobile-menu.open {
+      display: flex;
+    }
+    .mobile-menu a {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--deep-ink);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* ── HERO SECTION ────────────────────────────────────────── */
+    #hero {
+      padding: 60px 0 96px;
+      overflow: visible;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.95fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .hero-copy {
+      max-width: 630px;
+    }
+    .hero-headline {
+      font-size: clamp(2.7rem, 5.2vw, 4.4rem);
+      line-height: 1.05;
+      margin-bottom: 24px;
+      letter-spacing: -0.035em;
+    }
+    .highlight-lime {
+      display: inline-block;
+      position: relative;
+      background: var(--acid-lime);
+      color: var(--deep-ink);
+      padding: 0 12px;
+      border-radius: 8px;
+      margin-top: 4px;
+      box-shadow: 3px 4px 0px var(--deep-ink);
+    }
+    .hero-subtext {
+      font-size: clamp(1.08rem, 1.45vw, 1.25rem);
+      color: var(--muted-text);
+      line-height: 1.55;
+      margin-bottom: 32px;
+    }
+    .hero-subtext strong {
+      color: var(--deep-ink);
+    }
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .hero-annotation {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--muted-text);
+      font-style: italic;
+    }
+    .hero-annotation::before {
+      content: '✦';
+      color: var(--electric-purple);
+      font-style: normal;
+    }
+
+    /* Bespoke Hero Visuals */
+    .hero-illustration {
+      position: relative;
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-card {
+      position: absolute;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.3s ease;
+    }
+    .doc-original {
+      width: 280px;
+      background: var(--white);
+      border: 2px solid #E2DCD2;
+      left: 10px;
+      top: 30px;
+      transform: rotate(-6deg);
+      z-index: 2;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: #555;
+      box-shadow: -8px 12px 30px rgba(36, 33, 39, 0.12);
+    }
+    .doc-original:hover {
+      transform: rotate(-3deg) scale(1.02);
+    }
+    .doc-stamp {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #DC2626;
+      border: 1.5px solid #DC2626;
+      padding: 3px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      transform: rotate(-3deg);
+    }
+    .doc-original h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #1F2937;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .doc-redacted {
+      height: 6px;
+      background: #E5E7EB;
+      border-radius: 3px;
+      margin: 6px 0;
+    }
+    .doc-clause {
+      background: #FEF3C7;
+      border-left: 3px solid #D97706;
+      padding: 6px 8px;
+      margin: 10px 0;
+      font-size: 0.65rem;
+      color: #92400E;
+      line-height: 1.4;
+    }
+
+    .doc-result {
+      width: 295px;
+      background: var(--soft-lavender);
+      border: 2px solid var(--electric-purple);
+      right: 10px;
+      bottom: 25px;
+      transform: rotate(4deg);
+      z-index: 3;
+      box-shadow: 10px 16px 36px rgba(115, 87, 232, 0.25);
+    }
+    .doc-result:hover {
+      transform: rotate(2deg) scale(1.02);
+    }
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: var(--electric-purple);
+      color: var(--white);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 12px;
+    }
+    .result-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--deep-ink);
+      margin-bottom: 12px;
+    }
+    .result-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--deep-ink);
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+    .result-check {
+      color: var(--electric-purple);
+      font-weight: 800;
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    /* Floating Stickers */
+    .sticker {
+      position: absolute;
+      z-index: 4;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      pointer-events: none;
+      animation: float 4s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    .sticker-wtf {
+      top: 5px;
+      left: 15px;
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1.5px solid #F87171;
+      transform: rotate(-10deg);
+      animation-delay: 0.5s;
+    }
+    .sticker-boss {
+      top: 20px;
+      right: 20px;
+      background: var(--acid-lime);
+      color: var(--deep-ink);
+      border: 1.5px solid var(--deep-ink);
+      transform: rotate(8deg);
+      animation-delay: 1.2s;
+    }
+    .sticker-lore {
+      top: 52%;
+      left: 45%;
+      transform: translate(-50%, -50%) rotate(-4deg);
+      background: var(--white);
+      color: var(--electric-purple);
+      border: 1.5px solid var(--electric-purple);
+      box-shadow: 0 4px 14px rgba(115, 87, 232, 0.25);
+      z-index: 5;
+      animation-delay: 2s;
+    }
+    .sticker-clarity {
+      bottom: 5px;
+      left: 20px;
+      background: var(--soft-lavender);
+      color: var(--electric-purple);
+      border: 1.5px solid var(--electric-purple);
+      transform: rotate(-6deg);
+      animation-delay: 1.8s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(var(--rot, 0deg)); }
+      50% { transform: translateY(-7px) rotate(var(--rot, 0deg)); }
+    }
+    .sticker-wtf { --rot: -10deg; }
+    .sticker-boss { --rot: 8deg; }
+    .sticker-lore { --rot: -4deg; }
+    .sticker-clarity { --rot: -6deg; }
+
+    /* ── SECTION: WORKS FOR EVERYONE (FROM INFOGRAPHIC) ─────── */
+    #audience {
+      background: var(--cream-alt);
+      padding: 64px 0;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .audience-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 40px;
+    }
+    .audience-header h2 {
+      font-size: clamp(2rem, 3.4vw, 2.8rem);
+      margin-bottom: 10px;
+    }
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .audience-card {
+      background: var(--white);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px 18px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+    .audience-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--electric-purple);
+    }
+    .audience-avatar {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .audience-card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+    .audience-card p {
+      font-size: 0.8rem;
+      color: var(--muted-text);
+      line-height: 1.4;
+    }
+
+    /* ── SECTION D — THE PAIN POINT ──────────────────────────── */
+    #pain {
+      background: var(--cream);
+    }
+    .pain-header {
+      max-width: 680px;
+      margin-bottom: 48px;
+    }
+    .pain-header h2 {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      margin-bottom: 16px;
+    }
+    .pain-header p {
+      font-size: 1.15rem;
+      color: var(--muted-text);
+    }
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .pain-card {
+      background: var(--white);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 36px 28px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .pain-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--electric-purple);
+    }
+    .pain-card:nth-child(2)::before {
+      background: var(--acid-lime);
+    }
+    .pain-card:nth-child(3)::before {
+      background: #F87171;
+    }
+    .pain-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-dark);
+    }
+    .pain-number {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted-light);
+      margin-bottom: 16px;
+    }
+    .pain-card h3 {
+      font-size: 1.45rem;
+      margin-bottom: 12px;
+    }
+    .pain-card p {
+      color: var(--muted-text);
+      font-size: 0.96rem;
+      line-height: 1.55;
+    }
+
+    /* ── SECTION: CHATGPT VS LIFEBRIDGE (THE DIFFERENTIATOR) ── */
+    #vs-chatgpt {
+      background: var(--deep-ink);
+      color: var(--white);
+      border-radius: var(--radius-xl);
+      margin: 20px 24px;
+      padding: 96px 0;
+      position: relative;
+    }
+    .vs-header {
+      text-align: center;
+      max-width: 840px;
+      margin: 0 auto 56px;
+    }
+    .vs-header h2 {
+      color: var(--white);
+      font-size: clamp(2.3rem, 4.4vw, 3.6rem);
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+    .vs-golden-quote {
+      display: inline-block;
+      background: rgba(216, 245, 106, 0.12);
+      border: 1.5px solid var(--acid-lime);
+      color: var(--acid-lime);
+      font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+      font-weight: 700;
+      font-family: var(--font-display);
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      margin-bottom: 24px;
+      box-shadow: 0 0 24px rgba(216, 245, 106, 0.2);
+    }
+    .vs-header p {
+      color: #C0BDC9;
+      font-size: 1.15rem;
+      line-height: 1.6;
+    }
+
+    /* Comparison Battle Cards Grid */
+    .vs-battle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 32px;
+      margin-bottom: 64px;
+    }
+    .battle-card {
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-chatgpt {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      color: #B5B1BF;
+    }
+    .card-lifebridge {
+      background: rgba(115, 87, 232, 0.16);
+      border: 2px solid var(--electric-purple);
+      box-shadow: 0 16px 40px rgba(115, 87, 232, 0.35);
+      position: relative;
+    }
+    .battle-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      margin-bottom: 18px;
+      width: fit-content;
+    }
+    .badge-chatgpt {
+      background: rgba(255, 255, 255, 0.1);
+      color: #D1D5DB;
+    }
+    .badge-lifebridge {
+      background: var(--acid-lime);
+      color: var(--deep-ink);
+      box-shadow: 0 0 14px rgba(216, 245, 106, 0.4);
+    }
+    .battle-card h3 {
+      font-size: 1.7rem;
+      margin-bottom: 12px;
+    }
+    .card-chatgpt h3 {
+      color: #E5E7EB;
+    }
+    .card-lifebridge h3 {
+      color: var(--white);
+    }
+    .battle-question {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      margin-bottom: 24px;
+    }
+    .q-chatgpt {
+      background: rgba(0, 0, 0, 0.3);
+      color: #9CA3AF;
+      border-left: 3px solid #6B7280;
+    }
+    .q-lifebridge {
+      background: rgba(115, 87, 232, 0.25);
+      color: var(--acid-lime);
+      border-left: 3px solid var(--acid-lime);
+      font-weight: 600;
+    }
+    .battle-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 0.94rem;
+    }
+    .battle-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      line-height: 1.45;
+    }
+    .battle-list.chatgpt li::before {
+      content: '✕';
+      color: #EF4444;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .battle-list.lifebridge li::before {
+      content: '✓';
+      color: var(--acid-lime);
+      font-weight: 900;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* 4 Live Workflow Examples Tabs */
+    .examples-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+    }
+    .examples-nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .ex-tab-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #D1D5DB;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .ex-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--white);
+    }
+    .ex-tab-btn.active {
+      background: var(--electric-purple);
+      color: var(--white);
+      border-color: var(--electric-purple);
+      box-shadow: 0 4px 14px rgba(115, 87, 232, 0.4);
+    }
+
+    .ex-content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    .ex-pane {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .ex-pane-title {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      color: #9CA3AF;
+    }
+    .ex-pane.lifebridge-pane {
+      background: rgba(115, 87, 232, 0.1);
+      border-color: rgba(115, 87, 232, 0.3);
+    }
+    .ex-pane.lifebridge-pane .ex-pane-title {
+      color: var(--acid-lime);
+    }
+
+    /* ── SECTION E — HOW IT WORKS ──────────────────────────── */
+    #how-it-works {
+      background: var(--soft-lavender);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .hiw-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 64px;
+    }
+    .hiw-header h2 {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      margin-bottom: 16px;
+    }
+    .hiw-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 36px;
+      position: relative;
+    }
+    .hiw-step {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 36px 28px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(115, 87, 232, 0.15);
+      position: relative;
+      transition: all 0.25s ease;
+    }
+    .hiw-step:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--electric-purple);
+    }
+    .step-number {
+      font-family: var(--font-mono);
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--electric-purple);
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .hiw-step h3 {
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+    }
+    .hiw-step p {
+      color: var(--muted-text);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    /* ── SECTION: THE 8 LIFE OS PILLARS (THE MOAT) ───────────── */
+    #pillars {
+      background: var(--white);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .pillars-header {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 56px;
+    }
+    .pillars-header h2 {
+      font-size: clamp(2.3rem, 4vw, 3.4rem);
+      margin-bottom: 16px;
+    }
+    .pillars-header p {
+      color: var(--muted-text);
+      font-size: 1.15rem;
+    }
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .pillar-card {
+      background: var(--cream);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 30px 24px;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .pillar-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--electric-purple);
+    }
+    .pillar-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle);
+    }
+    .pillar-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+    .pillar-card p {
+      color: var(--muted-text);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+    .pillar-tag {
+      margin-top: auto;
+      padding-top: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--electric-purple);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── SECTION C — INTERACTIVE DOCUMENT & WORKFLOW DEMO ─────── */
+    #demo {
+      background: var(--cream);
+      padding: 96px 0;
+    }
+    .demo-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 36px;
+    }
+    .demo-header h2 {
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      margin-bottom: 16px;
+    }
+    .demo-header p {
+      color: var(--muted-text);
+      font-size: 1.15rem;
+    }
+
+    /* Preset switcher pills */
+    .preset-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .preset-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--muted-text);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 4px;
+    }
+    .preset-btn {
+      background: var(--white);
+      border: 1.5px solid var(--border-subtle);
+      color: var(--deep-ink);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .preset-btn:hover {
+      border-color: var(--electric-purple);
+      transform: translateY(-1px);
+    }
+    .preset-btn.active {
+      background: var(--deep-ink);
+      color: var(--acid-lime);
+      border-color: var(--deep-ink);
+      font-weight: 700;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Segmented Tab Controls */
+    .demo-controls {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .tab-switcher {
+      display: inline-flex;
+      background: rgba(36, 33, 39, 0.06);
+      padding: 6px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+    }
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: none;
+      color: var(--muted-text);
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: var(--electric-purple);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(115, 87, 232, 0.35);
+    }
+
+    /* Main Demo Viewer Layout */
+    .demo-viewer {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 32px;
+      background: var(--white);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .demo-pane {
+      background: var(--cream);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+    }
+    .pane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pane-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .tag-original {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #F87171;
+    }
+    .tag-output {
+      background: var(--soft-lavender);
+      color: var(--electric-purple);
+      border: 1px solid rgba(115, 87, 232, 0.3);
+    }
+
+    /* Sarvam AI Audio Bar */
+    .sarvam-audio-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--deep-ink);
+      color: var(--white);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .audio-play-btn {
+      background: var(--acid-lime);
+      color: var(--deep-ink);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .audio-play-btn:hover {
+      transform: scale(1.08);
+      background: var(--lime-dark);
+    }
+    .audio-track-info {
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      color: #E2DFE9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-grow: 1;
+    }
+    .sound-wave {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 16px;
+    }
+    .wave-bar {
+      width: 3px;
+      background: var(--acid-lime);
+      border-radius: 2px;
+      animation: wave 1.2s infinite ease-in-out;
+    }
+    .wave-bar:nth-child(1) { height: 6px; animation-delay: 0.1s; }
+    .wave-bar:nth-child(2) { height: 14px; animation-delay: 0.3s; }
+    .wave-bar:nth-child(3) { height: 10px; animation-delay: 0.2s; }
+    .wave-bar:nth-child(4) { height: 16px; animation-delay: 0.4s; }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.4); }
+      50% { transform: scaleY(1); }
+    }
+
+    /* Language pills */
+    .lang-toggle-bar {
+      display: flex;
+      gap: 5px;
+    }
+    .lang-btn {
+      background: var(--white);
+      border: 1px solid var(--border-subtle);
+      color: var(--deep-ink);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .lang-btn.active {
+      background: var(--electric-purple);
+      color: var(--white);
+      border-color: var(--electric-purple);
+      font-weight: 700;
+    }
+
+    /* Original Doc Text Box */
+    .doc-content-box {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: var(--deep-ink);
+      background: var(--white);
+      padding: 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Output Sections */
+    .output-section {
+      margin-bottom: 20px;
+    }
+    .output-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--electric-purple);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .output-summary {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--deep-ink);
+      background: var(--white);
+      border-left: 4px solid var(--electric-purple);
+      padding: 16px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Cross Document Discrepancy Alert */
+    .vault-alert-banner {
+      background: #FEF3C7;
+      border: 1.5px solid #F59E0B;
+      color: #92400E;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Quest Checklist */
+    .checklist-progress-container {
+      margin-bottom: 12px;
+    }
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--muted-text);
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .progress-bar-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(36, 33, 39, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--electric-purple), var(--acid-lime));
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .quest-checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .quest-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--white);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.92rem;
+    }
+    .quest-item:hover {
+      border-color: var(--electric-purple);
+      box-shadow: var(--shadow-sm);
+    }
+    .quest-item input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--electric-purple);
+      border-radius: 5px;
+      outline: none;
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      background: transparent;
+    }
+    .quest-item input[type="checkbox"]::before {
+      content: "✓";
+      color: var(--deep-ink);
+      font-size: 12px;
+      font-weight: 900;
+      transform: scale(0);
+      transition: transform 0.15s ease-in-out;
+    }
+    .quest-item input[type="checkbox"]:checked {
+      background: var(--acid-lime);
+      border-color: var(--acid-lime);
+    }
+    .quest-item input[type="checkbox"]:checked::before {
+      transform: scale(1);
+    }
+    .quest-item.checked {
+      opacity: 0.65;
+      text-decoration: line-through;
+    }
+
+    /* Meta details row */
+    .meta-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--white);
+      border: 1px solid var(--border-subtle);
+      color: var(--deep-ink);
+    }
+    .meta-pill strong {
+      color: var(--electric-purple);
+    }
+
+    /* Demo Actions */
+    .demo-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+    .btn-reset {
+      background: transparent;
+      border: 1px solid var(--border-dark);
+      color: var(--deep-ink);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-reset:hover {
+      background: var(--white);
+    }
+
+    /* Upload Zone (Right side) */
+    .upload-zone-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--cream-alt);
+      border: 2px dashed rgba(36, 33, 39, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      min-height: 520px;
+    }
+    .upload-zone-wrapper:hover, .upload-zone-wrapper.dragover {
+      background: var(--soft-lavender);
+      border-color: var(--electric-purple);
+      box-shadow: inset 0 0 20px rgba(115, 87, 232, 0.15);
+    }
+    .upload-icon-wrapper {
+      width: 68px;
+      height: 68px;
+      background: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 12px auto 16px;
+      color: var(--electric-purple);
+      font-size: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .upload-zone-wrapper h4 {
+      font-size: 1.35rem;
+      margin-bottom: 8px;
+    }
+    .upload-zone-wrapper p {
+      font-size: 0.9rem;
+      color: var(--muted-text);
+      max-width: 290px;
+      margin: 0 auto 18px;
+    }
+    .upload-file-types {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--muted-text);
+      background: var(--white);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      display: inline-block;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-subtle);
+    }
+    .upload-status-box {
+      font-size: 0.86rem;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      display: none;
+      margin-top: 14px;
+    }
+    .upload-status-box.error {
+      display: block;
+      background: #FEE2E2;
+      border: 1px solid #EF4444;
+      color: #991B1B;
+    }
+    .upload-status-box.scanning {
+      display: block;
+      background: var(--soft-lavender);
+      border: 1px solid var(--electric-purple);
+      color: var(--electric-purple);
+    }
+    .upload-status-box.success {
+      display: block;
+      background: #D1FAE5;
+      border: 1px solid #10B981;
+      color: #065F46;
+    }
+
+    /* ── SECTION: SUPPORTS ALL MAJOR DOCUMENT TYPES ──────────── */
+    #doc-types {
+      background: var(--cream-alt);
+      padding: 96px 0;
+    }
+    .doc-types-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 52px;
+    }
+    .doc-types-header h2 {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      margin-bottom: 16px;
+    }
+    .doc-types-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .doc-type-pill {
+      background: var(--white);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 22px 18px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .doc-type-pill:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--electric-purple);
+    }
+    .doc-type-emoji {
+      font-size: 1.8rem;
+      line-height: 1;
+    }
+    .doc-type-info h4 {
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+    .doc-type-info p {
+      font-size: 0.8rem;
+      color: var(--muted-text);
+      line-height: 1.4;
+    }
+
+    /* ── SECTION: VOICE-FIRST INDIA (SARVAM AI) ───────────────── */
+    #sarvam-voice {
+      background: var(--deep-ink);
+      color: var(--white);
+      border-radius: var(--radius-xl);
+      margin: 20px 24px;
+      padding: 96px 0;
+      position: relative;
+    }
+    .voice-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .voice-copy h2 {
+      color: var(--white);
+      font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+      margin-bottom: 20px;
+    }
+    .voice-copy p {
+      color: #C0BDC9;
+      font-size: 1.15rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .voice-quote-bubble {
+      background: rgba(255, 255, 255, 0.08);
+      border-left: 4px solid var(--acid-lime);
+      padding: 18px 22px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin-bottom: 28px;
+    }
+    .voice-quote-bubble p {
+      color: var(--acid-lime);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-family: var(--font-display);
+    }
+    .voice-quote-bubble span {
+      font-size: 0.88rem;
+      color: #A3A0AC;
+    }
+    .languages-badge-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .lang-pill {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--white);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+    }
+
+    .voice-interactive-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      text-align: center;
+    }
+    .mic-giant-btn {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--electric-purple);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin: 0 auto 24px;
+      border: 4px solid rgba(216, 245, 106, 0.4);
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(115, 87, 232, 0.5);
+      transition: all 0.25s ease;
+    }
+    .mic-giant-btn:hover {
+      transform: scale(1.08);
+      background: var(--purple-hover);
+    }
+    .voice-step-list {
+      text-align: left;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+      font-size: 0.9rem;
+    }
+    .voice-step-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #E2DFE9;
+    }
+    .voice-step-list li span:first-child {
+      color: var(--acid-lime);
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+
+    /* ── SECTION: PRICING (MATCHING INFOGRAPHIC) ─────────────── */
+    #pricing {
+      background: var(--cream);
+      padding: 96px 0;
+    }
+    .pricing-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 56px;
+    }
+    .pricing-header h2 {
+      font-size: clamp(2.3rem, 4vw, 3.4rem);
+      margin-bottom: 16px;
+    }
+    .pricing-header p {
+      color: var(--muted-text);
+      font-size: 1.15rem;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+    .pricing-card {
+      background: var(--white);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 36px 26px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .pricing-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+    }
+    .pricing-card.featured {
+      border-color: var(--electric-purple);
+      box-shadow: 0 16px 40px rgba(115, 87, 232, 0.2);
+      background: var(--white);
+    }
+    .popular-ribbon {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--electric-purple);
+      color: var(--white);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 12px rgba(115, 87, 232, 0.3);
+    }
+    .plan-title {
+      font-size: 1.45rem;
+      margin-bottom: 8px;
+    }
+    .plan-price {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+    .plan-price .amount {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--deep-ink);
+    }
+    .plan-price .period {
+      color: var(--muted-text);
+      font-size: 0.88rem;
+    }
+    .plan-desc {
+      font-size: 0.88rem;
+      color: var(--muted-text);
+      margin-bottom: 24px;
+      line-height: 1.45;
+    }
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+      font-size: 0.9rem;
+    }
+    .plan-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .plan-features li::before {
+      content: '✓';
+      color: var(--electric-purple);
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .pricing-card.featured .plan-features li::before {
+      color: var(--electric-purple);
+    }
+    .pricing-card .btn {
+      margin-top: auto;
+      width: 100%;
+    }
+
+    /* ── SECTION: TRUST & TRANSPARENCY ───────────────────────── */
+    #trust {
+      background: var(--white);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .trust-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 56px;
+    }
+    .trust-header h2 {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      margin-bottom: 16px;
+    }
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .trust-card {
+      padding: 36px 28px;
+      border-radius: var(--radius-lg);
+      background: var(--cream);
+      border: 1px solid var(--border-subtle);
+    }
+    .trust-card h3 {
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+    }
+    .trust-card p {
+      color: var(--muted-text);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    /* ── SECTION: FAQ ACCORDION ──────────────────────────────── */
+    #faq {
+      background: var(--cream);
+    }
+    .faq-header {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 52px;
+    }
+    .faq-header h2 {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      margin-bottom: 16px;
+    }
+    .faq-container {
+      max-width: 840px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .faq-item {
+      background: var(--white);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .faq-item.open {
+      border-color: var(--electric-purple);
+      box-shadow: var(--shadow-sm);
+    }
+    .faq-trigger {
+      width: 100%;
+      text-align: left;
+      padding: 22px 26px;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--deep-ink);
+    }
+    .faq-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--deep-ink);
+      flex-shrink: 0;
+      transition: transform 0.25s ease;
+    }
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      background: var(--electric-purple);
+      color: var(--white);
+    }
+    .faq-body {
+      padding: 0 26px 24px;
+      color: var(--muted-text);
+      font-size: 0.96rem;
+      line-height: 1.6;
+      display: none;
+    }
+    .faq-item.open .faq-body {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    /* ── SECTION: FINAL CTA ──────────────────────────────────── */
+    #final-cta {
+      background: var(--deep-ink);
+      color: var(--white);
+      text-align: center;
+      padding: 104px 0;
+      position: relative;
+    }
+    .final-cta-box {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .final-cta-box h2 {
+      color: var(--white);
+      font-size: clamp(2.4rem, 4.6vw, 4rem);
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+    .final-cta-box p {
+      color: #C0BDC9;
+      font-size: 1.25rem;
+      margin-bottom: 36px;
+    }
+    .cta-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .final-annotation {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--acid-lime);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    #footer {
+      background: #1A181D;
+      color: #9E9AA7;
+      padding: 72px 0 36px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.9rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+    .footer-brand h4 {
+      color: var(--white);
+      font-size: 1.35rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-brand p {
+      max-width: 320px;
+      line-height: 1.5;
+    }
+    .footer-col h5 {
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 18px;
+    }
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-links a {
+      color: #9E9AA7;
+      transition: color 0.2s ease;
+      cursor: pointer;
+    }
+    .footer-links a:hover {
+      color: var(--white);
+    }
+    .footer-bottom {
+      padding-top: 28px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 0.82rem;
+    }
+    .footer-signoff {
+      font-style: italic;
+      color: #C0BDC9;
+    }
+
+    /* ── MODALS (Privacy & Terms) ────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(36, 33, 39, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-content {
+      background: var(--white);
+      color: var(--deep-ink);
+      width: 100%;
+      max-width: 620px;
+      max-height: 85vh;
+      overflow-y: auto;
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: var(--cream);
+      border: 1px solid var(--border-subtle);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .modal-close-btn:hover {
+      background: var(--deep-ink);
+      color: var(--white);
+    }
+    .modal-content h3 {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+    }
+    .modal-content p, .modal-content ul {
+      font-size: 0.94rem;
+      color: var(--muted-text);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .modal-content ul {
+      padding-left: 20px;
+    }
+
+    /* ── TOAST NOTIFICATION ─────────────────────────────────── */
+    .toast-pill {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--deep-ink);
+      color: var(--acid-lime);
+      border: 1.5px solid var(--acid-lime);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      padding: 12px 20px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      font-weight: 600;
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(20px);
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .toast-pill.show {
+      display: flex;
+      transform: translateY(0);
+      animation: toastIn 0.25s ease;
+    }
+
+    /* ── SCROLL REVEAL & UTILITIES ───────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE DESIGN ───────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .hero-illustration {
+        height: 380px;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .vs-battle-grid {
+        grid-template-columns: 1fr;
+      }
+      .demo-viewer {
+        grid-template-columns: 1fr;
+      }
+      .audience-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .pain-grid, .hiw-steps, .pillars-grid, .doc-types-grid, .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .voice-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      section {
+        padding: 64px 0;
+      }
+      #hero {
+        padding: 40px 0 64px;
+      }
+      .nav-links, .nav-cta {
+        display: none;
+      }
+      .nav-hamburger {
+        display: flex;
+      }
+      #vs-chatgpt, #sarvam-voice {
+        margin: 12px 12px;
+        padding: 60px 0;
+        border-radius: var(--radius-lg);
+      }
+      .ex-content-grid {
+        grid-template-columns: 1fr;
+      }
+      .demo-viewer {
+        padding: 18px;
+      }
+      .audience-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .pain-grid, .hiw-steps, .pillars-grid, .doc-types-grid, .pricing-grid, .trust-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .hero-illustration {
+        height: 320px;
+      }
+      .doc-original {
+        width: 220px;
+        left: 0;
+        top: 10px;
+      }
+      .doc-result {
+        width: 230px;
+        right: 0;
+        bottom: 10px;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container, .container-wide {
+        padding: 0 16px;
+      }
+      .hero-headline {
+        font-size: 2.3rem;
+      }
+      .hero-ctas {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .hero-ctas .btn {
+        width: 100%;
+      }
+      .audience-grid {
+        grid-template-columns: 1fr;
+      }
+      .tab-switcher {
+        width: 100%;
+        display: flex;
+      }
+      .tab-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVIGATION BAR ─────────────────────────────────────── -->
+  <header id="navbar" role="banner">
+    <div class="container-wide">
+      <div class="nav-inner">
+        <!-- Logo -->
+        <a href="#hero" class="nav-logo" aria-label="LifeBridge Home">
+          <div class="logo-badge">LB</div>
+          <span>LifeBridge</span>
+          <span class="nav-tagline-pill">AI Life OS</span>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav role="navigation" aria-label="Main Navigation">
+          <ul class="nav-links">
+            <li><a href="#pain" class="nav-link">The Problem</a></li>
+            <li><a href="#vs-chatgpt" class="nav-link">Workflow vs Chat</a></li>
+            <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+            <li><a href="#demo" class="nav-link">Interactive Demo</a></li>
+            <li><a href="#pillars" class="nav-link">Life OS Vault</a></li>
+            <li><a href="#sarvam-voice" class="nav-link">Voice (Sarvam)</a></li>
+            <li><a href="#pricing" class="nav-link">Pricing</a></li>
+            <li><a href="#faq" class="nav-link">FAQ</a></li>
+          </ul>
+        </nav>
+
+        <!-- Primary CTA -->
+        <div class="nav-cta">
+          <a href="#demo" class="btn btn-primary btn-sm" id="nav-cta-btn">Decode Document ↗</a>
+        </div>
+
+        <!-- Mobile Hamburger -->
+        <button class="nav-hamburger" id="hamburger-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Menu Drawer -->
+  <div class="mobile-menu" id="mobile-menu" role="menu">
+    <a href="#pain" class="mobile-link" role="menuitem">The Problem</a>
+    <a href="#vs-chatgpt" class="mobile-link" role="menuitem">Workflow vs Chat</a>
+    <a href="#how-it-works" class="mobile-link" role="menuitem">How It Works</a>
+    <a href="#demo" class="mobile-link" role="menuitem">Interactive Demo</a>
+    <a href="#pillars" class="mobile-link" role="menuitem">Life OS Vault</a>
+    <a href="#sarvam-voice" class="mobile-link" role="menuitem">Voice in 10+ Languages</a>
+    <a href="#pricing" class="mobile-link" role="menuitem">Pricing</a>
+    <a href="#faq" class="mobile-link" role="menuitem">FAQ</a>
+    <a href="#demo" class="btn btn-primary mobile-link" role="menuitem" style="margin-top: 10px;">Decode Document ↗</a>
+  </div>
+
+  <main>
+    <!-- ── SECTION B — HERO ─────────────────────────────────── -->
+    <section id="hero" aria-labelledby="hero-title">
+      <div class="container">
+        <div class="hero-grid">
+          
+          <!-- Left side: Copy -->
+          <div class="hero-copy">
+            <div class="eyebrow">
+              <span class="pulse-dot"></span>
+              THE AI LIFE OPERATING SYSTEM · ANY DOCUMENT · ANY LANGUAGE
+            </div>
+
+            <h1 id="hero-title" class="hero-headline">
+              Confusing Documents?<br />
+              <span class="highlight-lime">Not Anymore.</span>
+            </h1>
+
+            <p class="hero-subtext">
+              ChatGPT tells you what a document says. <strong>LifeBridge tells you what to do with it.</strong> Turn complex paperwork, government circulars, medical reports, and legal agreements into simple explanations, verified next steps, and automated reminders — in your language.
+            </p>
+
+            <div class="hero-ctas">
+              <a href="#demo" class="btn btn-primary" id="hero-primary-cta">Try the Life OS Workflow ↗</a>
+              <a href="#vs-chatgpt" class="btn btn-secondary" id="hero-secondary-cta">Why Not Just ChatGPT? ↓</a>
+            </div>
+
+            <div class="hero-annotation">
+              Organized life = Less stress = More you. No PDF-induced existential crisis.
+            </div>
+          </div>
+
+          <!-- Right side: Bespoke Hero Illustration -->
+          <div class="hero-illustration" aria-hidden="true">
+            <!-- Floating Stickers -->
+            <div class="sticker sticker-wtf">WTF IS SECTION 80C? 🤯</div>
+            <div class="sticker sticker-boss">PDF BOSS FIGHT DEFEATED</div>
+            <div class="sticker sticker-lore">WORKFLOW &gt; CHATBOT</div>
+            <div class="sticker sticker-clarity">+100 CLARITY</div>
+
+            <!-- Fictional Intimidating Official Document -->
+            <div class="hero-card doc-original">
+              <span class="doc-stamp">CONFIDENTIAL / DEPT CIRCULAR</span>
+              <h4>APPLICATION FORM — VERSION FINAL FINAL 7</h4>
+              <p style="font-size:0.68rem; color:#6B7280; margin-bottom:8px;">REF NO: 2026/DHE/SCHOL/4B</p>
+              <div class="doc-redacted" style="width: 85%;"></div>
+              <div class="doc-redacted" style="width: 95%;"></div>
+              <div class="doc-clause">
+                <strong>CLAUSE 8.2.1:</strong> In accordance with notification 14/B, refer to Annexure 4B. Submission without gazetted seal renders candidate ineligible.
+              </div>
+              <div class="doc-redacted" style="width: 70%;"></div>
+              <div class="doc-redacted" style="width: 90%;"></div>
+            </div>
+
+            <!-- Clean LifeBridge Result Panel -->
+            <div class="hero-card doc-result">
+              <div class="result-badge">✦ LIFEBRIDGE LIFE OS</div>
+              <div class="result-title">Okay, here’s the deal.</div>
+
+              <div class="result-item">
+                <span class="result-check">✓</span>
+                <span>You qualify. Income &lt; ₹3.5L verified.</span>
+              </div>
+              <div class="result-item">
+                <span class="result-check">✓</span>
+                <span>Need: Tehsildar Income Certificate + 4B.</span>
+              </div>
+              <div class="result-item">
+                <span class="result-check">✓</span>
+                <span>Deadline: <strong>31 Oct 2026</strong>. Reminder set!</span>
+              </div>
+              <div class="result-item">
+                <span class="result-check">✓</span>
+                <span>Official state portal link bookmarked.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: WORKS FOR EVERYONE (FROM INFOGRAPHIC) ─────── -->
+    <section id="audience" aria-labelledby="audience-title">
+      <div class="container">
+        <div class="audience-header reveal">
+          <div class="eyebrow">BUILT FOR REAL LIFE</div>
+          <h2 id="audience-title">Works for everyone. Solves paperwork everywhere.</h2>
+          <p>Important paperwork comes in difficult language, and life doesn’t come with a translator.</p>
+        </div>
+
+        <div class="audience-grid">
+          <div class="audience-card reveal">
+            <span class="audience-avatar">🎓</span>
+            <h3>Students</h3>
+            <p>Admission letters, scholarships, entrance exam instructions & fees.</p>
+          </div>
+          <div class="audience-card reveal">
+            <span class="audience-avatar">💼</span>
+            <h3>Working Pros</h3>
+            <p>Offer letters, tax exemptions, employment contracts & loan forms.</p>
+          </div>
+          <div class="audience-card reveal">
+            <span class="audience-avatar">👨‍👩‍👧‍👦</span>
+            <h3>Families</h3>
+            <p>Manage medical bills, rental agreements, child school forms & insurance.</p>
+          </div>
+          <div class="audience-card reveal">
+            <span class="audience-avatar">👵</span>
+            <h3>Senior Citizens</h3>
+            <p>Pension circulars, medical test summaries, hospital discharge papers.</p>
+          </div>
+          <div class="audience-card reveal">
+            <span class="audience-avatar">🏪</span>
+            <h3>Small Businesses</h3>
+            <p>GST filing circulars, vendor contracts, licenses & subsidy notices.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION D — THE PAIN POINT ──────────────────────────── -->
+    <section id="pain" aria-labelledby="pain-title">
+      <div class="container">
+        <div class="pain-header reveal">
+          <div class="eyebrow">THE REAL TALK</div>
+          <h2 id="pain-title">Why does every PDF feel like a side quest?</h2>
+          <p>Tiny text. Fifteen conditions. Three certificates you’ve never heard of. And somehow, the deadline is tomorrow.</p>
+        </div>
+
+        <div class="pain-grid">
+          
+          <div class="pain-card reveal">
+            <div class="pain-number">01 / JARGON OVERLOAD</div>
+            <h3>The language is wild.</h3>
+            <p>Official terminology doing absolutely the most. Words like <em>“notwithstanding”</em> and <em>“hereinafter”</em> when they just mean <em>“bring your electricity bill.”</em></p>
+          </div>
+
+          <div class="pain-card reveal">
+            <div class="pain-number">02 / SCATTERED INSTRUCTIONS</div>
+            <h3>The instructions are scattered.</h3>
+            <p>Eligibility on page 2. Required documents on page 11. Format guidelines tucked away in Annexure 4B. Your sanity nowhere to be found.</p>
+          </div>
+
+          <div class="pain-card reveal">
+            <div class="pain-number">03 / SNEAKY TIMERS</div>
+            <h3>The deadline waits for nobody.</h3>
+            <p>Miss one small certificate seal or confusing submission window, and you miss out on financial aid, a subsidy, or an entire recruitment cycle.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: CHATGPT VS LIFEBRIDGE (THE DIFFERENTIATOR) ── -->
+    <section id="vs-chatgpt" aria-labelledby="vs-title">
+      <div class="container-wide">
+        
+        <div class="vs-header reveal">
+          <div class="eyebrow eyebrow-dark">
+            <span class="pulse-dot"></span>
+            THE JUDGE-WINNING DIFFERENTIATION
+          </div>
+          <h2 id="vs-title">Why not just upload the document to ChatGPT or Gemini?</h2>
+          
+          <div class="vs-golden-quote">
+            “Because ChatGPT answers questions. LifeBridge solves document workflows.”
+          </div>
+
+          <p>
+            ChatGPT answers: <em>“What does this document mean?”</em><br />
+            LifeBridge answers: <strong>“What should I do next?”</strong><br />
+            That single sentence changes everything. Never compete with the model — compete with the workflow. The workflow is the product.
+          </p>
+        </div>
+
+        <!-- Side-by-Side Battle Grid -->
+        <div class="vs-battle-grid reveal">
+          
+          <!-- Left: Generic Chatbot -->
+          <div class="battle-card card-chatgpt">
+            <span class="battle-badge badge-chatgpt">GENERIC AI CHATBOT</span>
+            <h3>Upload Loan Agreement.pdf</h3>
+            <div class="battle-question q-chatgpt">
+              "Here is a 4-page summary of the document."
+            </div>
+            <ul class="battle-list chatgpt">
+              <li><strong>Conversation ends:</strong> Closes the tab and forgets everything.</li>
+              <li><strong>Zero memory:</strong> Upload another document tomorrow, it has no clue what happened yesterday.</li>
+              <li><strong>No actions taken:</strong> Doesn't check your calendar, doesn't verify your other IDs.</li>
+              <li><strong>Passive text wall:</strong> Leaves you with 10 paragraphs of legal breakdown instead of a checklist.</li>
+              <li><strong>English-first assumption:</strong> Millions of Indians cannot read technical English.</li>
+            </ul>
+          </div>
+
+          <!-- Right: LifeBridge Life OS -->
+          <div class="battle-card card-lifebridge">
+            <span class="battle-badge badge-lifebridge">LIFEBRIDGE WORKFLOW ENGINE</span>
+            <h3>Upload Any Document</h3>
+            <div class="battle-question q-lifebridge">
+              "Understood. Here is your actionable next step & calendar reminder."
+            </div>
+            <ul class="battle-list lifebridge">
+              <li><strong>Automatically organizes:</strong> Classifies into Medical, Govt, Finance, Legal & Vault.</li>
+              <li><strong>Finds deadlines & sets reminders:</strong> Detects cutoff dates and syncs alerts to calendar.</li>
+              <li><strong>Smart cross-document checks:</strong> Flags if your rental agreement address mismatches your Aadhaar.</li>
+              <li><strong>Actionable Quest Checklist:</strong> Interactive to-do list with verified official portals.</li>
+              <li><strong>Voice-First in 10+ Indian Languages:</strong> Powered by Sarvam AI (STT + TTS) so anyone can speak & listen.</li>
+              <li><strong>Persistent Life Vault:</strong> Remembers your records forever. Search: <em>"Find insurance expiring this year."</em></li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- 4 Real-World Comparison Walkthroughs -->
+        <div class="examples-box reveal">
+          <h3 style="color:var(--white); text-align:center; font-size:1.6rem; margin-bottom:24px;">
+            See the difference across 4 everyday life situations
+          </h3>
+
+          <div class="examples-nav">
+            <button class="ex-tab-btn active" data-ex="govt">🏛️ Government Scheme</button>
+            <button class="ex-tab-btn" data-ex="job">💼 Job Offer Letter</button>
+            <button class="ex-tab-btn" data-ex="medical">🩺 Medical Diagnostic</button>
+            <button class="ex-tab-btn" data-ex="rental">📜 Rental / Loan Agreement</button>
+          </div>
+
+          <div class="ex-content-grid" id="example-content-display">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION E — HOW IT WORKS ──────────────────────────── -->
+    <section id="how-it-works" aria-labelledby="hiw-title">
+      <div class="container">
+        
+        <div class="hiw-header reveal">
+          <div class="eyebrow">THE PROTOCOL</div>
+          <h2 id="hiw-title">Three steps. Zero PDF-induced existential crises.</h2>
+          <p>Super simple. Like chatting with a trusted, hyper-competent friend.</p>
+        </div>
+
+        <div class="hiw-steps">
+          
+          <div class="hiw-step reveal">
+            <div class="step-number">01</div>
+            <h3>Drop the document</h3>
+            <p>Upload a notice, application form, PDF, photo, or voice note. Smartphone camera or digital document — LifeBridge ingests it instantly.</p>
+          </div>
+
+          <div class="hiw-step reveal">
+            <div class="step-number">02</div>
+            <h3>Get the human translation</h3>
+            <p>Understand key eligibility points, hidden exceptions, and required annexures in simple language. Listen aloud in Hindi, Marathi, or Tamil.</p>
+          </div>
+
+          <div class="hiw-step reveal">
+            <div class="step-number">03</div>
+            <h3>Make your move</h3>
+            <p>Follow an interactive quest checklist, receive proactive deadline alerts in your calendar, and save verified records in your personal vault.</p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION: THE 8 LIFE OS PILLARS (THE REAL MOAT) ──────── -->
+    <section id="pillars" aria-labelledby="pillars-title">
+      <div class="container">
+        
+        <div class="pillars-header reveal">
+          <div class="eyebrow">THE UNCOPYABLE MOAT</div>
+          <h2 id="pillars-title">Features a generic chatbot will never build.</h2>
+          <p>Don’t compete with the LLM model. Compete with the document operating system.</p>
+        </div>
+
+        <div class="pillars-grid">
+          
+          <div class="pillar-card reveal">
+            <div class="pillar-icon-box">🗄️</div>
+            <h3>1. AI Document Vault</h3>
+            <p>Instead of one-off chat sessions, users get a searchable life archive. Search: <em>“Show every document where my Aadhaar appears”</em> or <em>“Find policies expiring this year.”</em></p>
+            <div class="pillar-tag">Persistent Knowledge</div>
+          </div>
+
+          <div class="pillar-card reveal">
+            <div class="pillar-icon-box">🔗</div>
+            <h3>2. Cross-Document Intelligence</h3>
+            <p>Detects hidden inconsistencies across your life files: <em>“Your rental agreement has your old address,”</em> or <em>“Your passport surname doesn’t match your PAN.”</em></p>
+            <div class="pillar-tag">Discrepancy Engine</div>
+          </div>
+
+          <div class="pillar-card reveal">
+            <div class="pillar-icon-box">🎯</div>
+            <h3>3. Life Events Engine</h3>
+            <p>Organizes around human milestones, not random PDFs: 🎓 College Admission (fees, hostel, scholarship), 👶 New Baby (birth certificate, vaccines, insurance).</p>
+            <div class="pillar-tag">Event Bundling</div>
+          </div>
+
+          <div class="pillar-card reveal">
+            <div class="pillar-icon-box">⏰</div>
+            <h3>4. Smart Expiry & Deadlines</h3>
+            <p>Automatically detects and sets calendar alerts: Passport expiring in 5 months, vehicle insurance renewal next week, scholarship cutoff tomorrow.</p>
+            <div class="pillar-tag">Proactive Reminders</div>
+          </div>
+
+          <div class="pillar-card reveal">
+            <div class="pillar-icon-box">🎤</div>
+            <h3>5. Voice-First India (Sarvam)</h3>
+            <p>Grandmother says: <em>“Mujhe ye samjhao.”</em> No typing. No reading. AI reads the document, understands in Hindi, and speaks aloud in Marathi or Tamil.</p>
+            <div class="pillar-tag">10+ Indian Languages</div>
+          </div>
+
+          <div class="pillar-card reveal">
+            <div class="pillar-icon-box">👨‍👩‍👧‍👦</div>
+            <h3>6. Family Workspace</h3>
+            <p>Indian families don’t manage documents in silos. One account for parents, grandparents, and kids with shared folders and emergency hospital access.</p>
+            <div class="pillar-tag">Multi-Generational</div>
+          </div>
+
+          <div class="pillar-card reveal">
+            <div class="pillar-icon-box">✍️</div>
+            <h3>7. AI Form Auto-Fill</h3>
+            <p>Reads your verified vault documents (Aadhaar, PAN, Marksheets, Caste Certificate) and auto-populates painful government and admission application forms.</p>
+            <div class="pillar-tag">Zero Repetitive Typing</div>
+          </div>
+
+          <div class="pillar-card reveal">
+            <div class="pillar-icon-box">🤝</div>
+            <h3>8. Community Knowledge</h3>
+            <p>When 10,000 citizens upload the same circular, LifeBridge surfaces crowdsourced tips: frequent rejection traps, missing annexures, and verified office links.</p>
+            <div class="pillar-tag">Collective Wisdom</div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION C — INTERACTIVE DOCUMENT & WORKFLOW DEMO ─────── -->
+    <section id="demo" aria-labelledby="demo-title">
+      <div class="container-wide">
+        
+        <div class="demo-header reveal">
+          <div class="eyebrow">
+            <span class="pulse-dot"></span>
+            LIVE INTERACTIVE PREVIEW
+          </div>
+          <h2 id="demo-title">From “what even is this?” to “ohhh, got it.”</h2>
+          <p>One confusing document. A clearer plan. We love character development.</p>
+        </div>
+
+        <!-- Document Presets Picker -->
+        <div class="preset-bar reveal">
+          <span class="preset-label">Sample Workflows:</span>
+          <button class="preset-btn active" data-preset="scholarship">🎓 Scholarship Circular</button>
+          <button class="preset-btn" data-preset="scheme">🌾 Farmer Solar Scheme</button>
+          <button class="preset-btn" data-preset="job">💼 Engineering Job Offer</button>
+          <button class="preset-btn" data-preset="medical">🩺 Blood & Liver Diagnostic</button>
+        </div>
+
+        <!-- Segmented Tab Controls -->
+        <div class="demo-controls reveal">
+          <div class="tab-switcher" role="tablist" aria-label="Demo view states">
+            <button class="tab-btn active" id="tab-btn-original" role="tab" aria-selected="true" aria-controls="pane-original">
+              📄 Original Document
+            </button>
+            <button class="tab-btn" id="tab-btn-output" role="tab" aria-selected="false" aria-controls="pane-output">
+              ✨ LifeBridge Action Plan
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Demo Area -->
+        <div class="demo-viewer reveal">
+          
+          <!-- Left: Document View (Original or LifeBridge Output) -->
+          <div class="demo-pane" id="demo-pane-container">
+            
+            <!-- State 1: Original Document -->
+            <div id="pane-original">
+              <div class="pane-header">
+                <span class="pane-tag tag-original">ORIGINAL SOURCE · UNEDITED</span>
+                <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--muted-text);" id="doc-source-meta">Govt. Circular No. DHE-8821</span>
+              </div>
+
+              <div class="doc-content-box" id="original-doc-text">
+DEPT. OF HIGHER & TECHNICAL EDUCATION — MAHARASHTRA
+NOTIFICATION NO: DHE/SCHOL/2026/UG-8821
+DATE: 12TH AUGUST 2026
+
+SUBJECT: Post-Matriculation Merit-cum-Means Financial Assistance 2026-27.
+
+Applications are hereby invited from eligible second-year undergraduate degree candidates for financial disbursement under Scheme 4B.
+
+1. CRITICAL ELIGIBILITY PREREQUISITES:
+   (i) Candidate must be enrolled full-time in an affiliated university/autonomous college.
+   (ii) Minimum aggregate score of 70.00% (or equivalent 7.50 CGPA) in the first year of study.
+   (iii) Annual household gross income from all verified sources MUST NOT EXCEED INR 3,50,000/- per annum.
+
+2. MANDATORY DOCUMENTARY VERIFICATION:
+   Candidates shall furnish:
+   - Form 4B signed by the Head of Institution.
+   - Income Certificate issued strictly by an officer not below the rank of Tehsildar (valid for AY 2026-27).
+   - Grade transcript for semesters 1 & 2 attested by Controller of Examinations.
+
+3. SUBMISSION PROCEDURE & FINAL CLOSING DATES:
+   Strict online submission via state scholarship portal before 31st October 2026, 11:59 PM IST.
+   Physical documents must reach the district scrutiny committee by 15th November 2026.
+   *NOTE: Defective applications or unverified annexures shall be summarily rejected without hearing.*
+              </div>
+            </div>
+
+            <!-- State 2: LifeBridge Decoded Action Plan -->
+            <div id="pane-output" style="display: none;">
+              
+              <!-- Sarvam AI Audio Bar -->
+              <div class="sarvam-audio-bar">
+                <button class="audio-play-btn" id="audio-play-btn" title="Listen aloud in your language">▶</button>
+                <div class="audio-track-info">
+                  <span id="audio-status-label">🔊 Listen in Hindi (Powered by Sarvam TTS)</span>
+                  <div class="sound-wave" id="sound-wave-anim" style="display:none;">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                  </div>
+                </div>
+                
+                <!-- Language Selector -->
+                <div class="lang-toggle-bar" title="Change explanation language">
+                  <button class="lang-btn active" data-lang="en">EN</button>
+                  <button class="lang-btn" data-lang="hi">हिन्दी</button>
+                  <button class="lang-btn" data-lang="mr">मराठी</button>
+                  <button class="lang-btn" data-lang="ta">தமிழ்</button>
+                  <button class="lang-btn" data-lang="te">తెలుగు</button>
+                </div>
+              </div>
+
+              <!-- Cross-Document Discrepancy Alert -->
+              <div class="vault-alert-banner" id="vault-discrepancy-banner">
+                <span>⚠️</span>
+                <span id="vault-alert-text"><strong>Smart Vault Notice:</strong> Your uploaded Aadhaar on file has address in Pune, but college certification lists Mumbai. Verification may need Bonafide Certificate.</span>
+              </div>
+
+              <!-- Plain English Summary -->
+              <div class="output-section">
+                <div class="output-label">THE SHORT VERSION</div>
+                <div class="output-summary" id="output-summary-text">
+                  You qualify for this scholarship! Family income is verified under ₹3.5 Lakh, and your 1st-year CGPA satisfies the 70% threshold.
+                </div>
+              </div>
+
+              <!-- Interactive Quest Checklist -->
+              <div class="output-section">
+                <div class="checklist-progress-container">
+                  <div class="progress-stats">
+                    <span class="output-label" style="margin-bottom:0;">YOUR QUEST CHECKLIST</span>
+                    <span id="progress-text">0 / 5 completed</span>
+                  </div>
+                  <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                  </div>
+                </div>
+
+                <ul class="quest-checklist" id="quest-checklist-items">
+                  <!-- Dynamically populated via JS -->
+                </ul>
+              </div>
+
+              <!-- Meta Pills (Deadlines & Vault sync) -->
+              <div class="meta-pills-row">
+                <div class="meta-pill">
+                  <span>📅 Deadline:</span>
+                  <strong id="output-deadline-text">31st October 2026</strong>
+                </div>
+                <div class="meta-pill">
+                  <span>⏰ Calendar:</span>
+                  <strong id="calendar-sync-badge">✓ Reminder Added (24h before)</strong>
+                </div>
+                <div class="meta-pill">
+                  <span>📁 Stored:</span>
+                  <strong id="vault-category-text">Vault &gt; Education &gt; Scholarships</strong>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Demo Footer Actions -->
+            <div class="demo-actions">
+              <span style="font-size:0.78rem; color:var(--muted-text);">💡 Cross-checks with personal document vault</span>
+              <button class="btn-reset" id="reset-demo-btn">↺ Reset Demo Checklist</button>
+            </div>
+
+          </div>
+
+          <!-- Right: Upload Dropzone Simulator -->
+          <div class="upload-zone-wrapper" id="upload-dropzone">
+            <input type="file" id="file-upload-input" accept=".pdf,image/png,image/jpeg,image/webp" style="display:none;" />
+            
+            <div>
+              <div class="upload-icon-wrapper">
+                <span>📁</span>
+              </div>
+              <h4>Drop Any Document Here</h4>
+              <p>Medical report, loan agreement, scholarship circular, or electricity bill.</p>
+              
+              <div class="upload-file-types">
+                PDF, PNG, JPG, WEBP (Max 10MB)
+              </div>
+            </div>
+
+            <div>
+              <button class="btn btn-lime btn-sm" id="browse-file-btn" style="width:100%; margin-bottom:12px;">
+                Choose Document to Decode
+              </button>
+              
+              <div class="upload-status-box" id="upload-status-display"></div>
+            </div>
+
+            <div style="font-size:0.75rem; color:var(--muted-text);">
+              🔒 <strong>Local Sandbox:</strong> Client-safe simulation. Ephemeral processing with zero unauthorized data selling.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION: SUPPORTS ALL MAJOR DOCUMENT TYPES ──────────── -->
+    <section id="doc-types" aria-labelledby="doc-types-title">
+      <div class="container">
+        
+        <div class="doc-types-header reveal">
+          <div class="eyebrow">DOCUMENT COVERAGE</div>
+          <h2 id="doc-types-title">Supports every document that matters in your life.</h2>
+          <p>From healthcare diagnostics to property tax circulars, LifeBridge understands the context.</p>
+        </div>
+
+        <div class="doc-types-grid">
+          
+          <div class="doc-type-pill reveal">
+            <div class="doc-type-emoji">🩺</div>
+            <div class="doc-type-info">
+              <h4>Medical Reports & Prescriptions</h4>
+              <p>Blood tests, MRI scans, prescriptions & discharge summaries.</p>
+            </div>
+          </div>
+
+          <div class="doc-type-pill reveal">
+            <div class="doc-type-emoji">🏛️</div>
+            <div class="doc-type-info">
+              <h4>Government Schemes</h4>
+              <p>Subsidy notices, citizen welfare circulars, ration rules.</p>
+            </div>
+          </div>
+
+          <div class="doc-type-pill reveal">
+            <div class="doc-type-emoji">🎓</div>
+            <div class="doc-type-info">
+              <h4>Education & Grants</h4>
+              <p>Merit scholarships, college admission rules, hostel forms.</p>
+            </div>
+          </div>
+
+          <div class="doc-type-pill reveal">
+            <div class="doc-type-emoji">💼</div>
+            <div class="doc-type-info">
+              <h4>Job & Employment</h4>
+              <p>Offer letters, employment contracts, relieving certificates.</p>
+            </div>
+          </div>
+
+          <div class="doc-type-pill reveal">
+            <div class="doc-type-emoji">🏦</div>
+            <div class="doc-type-info">
+              <h4>Banking & Loans</h4>
+              <p>Home loan sanction letters, EMI terms, insurance policies.</p>
+            </div>
+          </div>
+
+          <div class="doc-type-pill reveal">
+            <div class="doc-type-emoji">⚖️</div>
+            <div class="doc-type-info">
+              <h4>Legal Agreements</h4>
+              <p>Rental deeds, affidavits, NDAs, builder agreements.</p>
+            </div>
+          </div>
+
+          <div class="doc-type-pill reveal">
+            <div class="doc-type-emoji">🧾</div>
+            <div class="doc-type-info">
+              <h4>Bills & Taxes</h4>
+              <p>Electricity bills, property tax notices, Section 80C slips.</p>
+            </div>
+          </div>
+
+          <div class="doc-type-pill reveal">
+            <div class="doc-type-emoji">📜</div>
+            <div class="doc-type-info">
+              <h4>Certificates & IDs</h4>
+              <p>Aadhaar, PAN, 7/12 land records, caste & domicile certificates.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION: VOICE-FIRST INDIA (SARVAM AI) ───────────────── -->
+    <section id="sarvam-voice" aria-labelledby="voice-title">
+      <div class="container-wide">
+        <div class="voice-grid">
+          
+          <!-- Left: Narrative -->
+          <div class="voice-copy reveal">
+            <div class="eyebrow eyebrow-dark">
+              <span class="pulse-dot"></span>
+              POWERED BY SARVAM AI (STT + TTS)
+            </div>
+            <h2 id="voice-title">Solving an accessibility problem, not just translation.</h2>
+            <p>
+              Most AI apps assume users can read complex English comfortably. Millions of Indian citizens, elders, and rural families cannot.
+            </p>
+
+            <div class="voice-quote-bubble">
+              <p>“Mujhe ye samjhao.”</p>
+              <span>No typing. No reading legalese. Just natural voice conversation in your mother tongue.</span>
+            </div>
+
+            <p style="font-size:0.95rem;">
+              Talk, type, or snap a photo — LifeBridge speaks your language:
+            </p>
+
+            <div class="languages-badge-cloud">
+              <span class="lang-pill">हिन्दी (Hindi)</span>
+              <span class="lang-pill">தமிழ் (Tamil)</span>
+              <span class="lang-pill">తెలుగు (Telugu)</span>
+              <span class="lang-pill">मराठी (Marathi)</span>
+              <span class="lang-pill">বাংলা (Bengali)</span>
+              <span class="lang-pill">ಕನ್ನಡ (Kannada)</span>
+              <span class="lang-pill">മലയാളം (Malayalam)</span>
+              <span class="lang-pill">ગુજરાતી (Gujarati)</span>
+              <span class="lang-pill">ଓଡ଼ିଆ (Odia)</span>
+              <span class="lang-pill">اردو (Urdu)</span>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Voice Demo -->
+          <div class="voice-interactive-card reveal">
+            <div class="mic-giant-btn" id="voice-simulate-btn" title="Simulate voice conversation">
+              🎙️
+            </div>
+            <h4 style="color:var(--white); font-size:1.35rem; margin-bottom:8px;">Tap to Speak</h4>
+            <p style="color:#C0BDC9; font-size:0.9rem; margin-bottom:20px;" id="voice-status-text">
+              Try asking: <em>"Scholarship form kab tak jama karna hai?"</em>
+            </p>
+
+            <ul class="voice-step-list">
+              <li><span>01</span> <span>Voice speech recognized via Sarvam STT</span></li>
+              <li><span>02</span> <span>Document ingested & analyzed via Gemini AI</span></li>
+              <li><span>03</span> <span>Actionable response synthesized in Marathi/Hindi</span></li>
+              <li><span>04</span> <span>Clear audio playback streamed to user</span></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: PRICING (MATCHING INFOGRAPHIC) ─────────────── -->
+    <section id="pricing" aria-labelledby="pricing-title">
+      <div class="container">
+        
+        <div class="pricing-header reveal">
+          <div class="eyebrow">PRICING TIERS</div>
+          <h2 id="pricing-title">Clarity shouldn’t be a luxury.</h2>
+          <p>Simple, affordable plans for individuals, families, and organizations.</p>
+        </div>
+
+        <div class="pricing-grid">
+          
+          <!-- Free Tier -->
+          <div class="pricing-card reveal">
+            <h3 class="plan-title">FREE</h3>
+            <div class="plan-price">
+              <span class="amount">₹0</span>
+              <span class="period">/ month</span>
+            </div>
+            <p class="plan-desc">For occasional document decodes & basic understanding.</p>
+            <ul class="plan-features">
+              <li>3 document uploads / month</li>
+              <li>Basic plain-language explanations</li>
+              <li>Simple next steps & checklists</li>
+              <li>Access in Indian languages</li>
+              <li>Standard OCR text parsing</li>
+            </ul>
+            <a href="#demo" class="btn btn-secondary btn-sm">Get Started</a>
+          </div>
+
+          <!-- Pro Tier (Most Popular) -->
+          <div class="pricing-card featured reveal">
+            <div class="popular-ribbon">🔥 MOST POPULAR</div>
+            <h3 class="plan-title">PRO</h3>
+            <div class="plan-price">
+              <span class="amount">₹199</span>
+              <span class="period">/ month</span>
+            </div>
+            <p class="plan-desc">For students, jobseekers & professionals managing frequent paperwork.</p>
+            <ul class="plan-features">
+              <li>Unlimited document uploads</li>
+              <li>Detailed explanations & hidden clauses</li>
+              <li>Automated deadline & calendar reminders</li>
+              <li>AI Chat with entire document history</li>
+              <li>Voice input (STT) & audio explanations (TTS)</li>
+              <li>Priority parsing engine</li>
+            </ul>
+            <a href="#demo" class="btn btn-primary btn-sm">Upgrade to Pro</a>
+          </div>
+
+          <!-- Family Tier -->
+          <div class="pricing-card reveal">
+            <h3 class="plan-title">FAMILY</h3>
+            <div class="plan-price">
+              <span class="amount">₹499</span>
+              <span class="period">/ month</span>
+            </div>
+            <p class="plan-desc">For households managing elderly parents, medical records & kids' education.</p>
+            <ul class="plan-features">
+              <li>Up to 6 family member profiles</li>
+              <li>Shared family document vault</li>
+              <li>Automated reminders for everyone</li>
+              <li>Personalized doctor & scheme guidance</li>
+              <li>Voice access for seniors & kids</li>
+              <li>Emergency medical card sharing</li>
+            </ul>
+            <button class="btn btn-secondary btn-sm" id="family-plan-btn">Choose Family</button>
+          </div>
+
+          <!-- Business / API Tier -->
+          <div class="pricing-card reveal">
+            <h3 class="plan-title">BUSINESS / API</h3>
+            <div class="plan-price">
+              <span class="amount">Custom</span>
+              <span class="period">Pricing</span>
+            </div>
+            <p class="plan-desc">For clinics, colleges, banks, NGOs & legal teams.</p>
+            <ul class="plan-features">
+              <li>Bulk document processing</li>
+              <li>White-label hospital/school integration</li>
+              <li>Role-based access & audit logs</li>
+              <li>Custom webhook & CRM APIs</li>
+              <li>Dedicated account manager & SLA</li>
+              <li>Enterprise data compliance</li>
+            </ul>
+            <a href="mailto:partners@lifebridge.app" class="btn btn-secondary btn-sm">Let’s Talk</a>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION: TRUST & TRANSPARENCY ───────────────────────── -->
+    <section id="trust" aria-labelledby="trust-title">
+      <div class="container">
+        
+        <div class="trust-header reveal">
+          <div class="eyebrow">OUR ETHOS</div>
+          <h2 id="trust-title">Helpful AI. Your brain still gets the final say.</h2>
+          <p>We believe in verified facts, complete privacy, and zero empty promises.</p>
+        </div>
+
+        <div class="trust-grid">
+          
+          <div class="trust-card reveal">
+            <h3>Show your working</h3>
+            <p>LifeBridge doesn’t hallucinate. It cites and highlights the exact clauses, circular numbers, and paragraphs from the source document that support every explanation.</p>
+          </div>
+
+          <div class="trust-card reveal">
+            <h3>Verify the important stuff</h3>
+            <p>Confirm critical cutoffs, eligibility conditions, and application links against the official government circular before filing.</p>
+          </div>
+
+          <div class="trust-card reveal">
+            <h3>Stay in complete control</h3>
+            <p>No document selling, no training public LLMs on your private papers. Documents processed in sandbox mode stay private and encrypted.</p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION: FAQ ACCORDION ──────────────────────────────── -->
+    <section id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        
+        <div class="faq-header reveal">
+          <div class="eyebrow">COMMON QUERIES</div>
+          <h2 id="faq-title">Questions before you trust us with your PDF? Fair.</h2>
+          <p>Clear, honest answers to what judges and users ask.</p>
+        </div>
+
+        <div class="faq-container">
+          
+          <div class="faq-item reveal">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>Why not just upload documents to ChatGPT or Gemini?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              Because ChatGPT answers questions, while LifeBridge solves document workflows. A chatbot gives you a text summary and closes the session. LifeBridge automatically categorizes files in a persistent vault, detects deadlines, syncs calendar reminders, checks cross-document discrepancies (like an address mismatch with your Aadhaar), and provides voice explanations in 10+ Indian languages.
+            </div>
+          </div>
+
+          <div class="faq-item reveal">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>What exactly does LifeBridge do?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              LifeBridge ingests confusing official paperwork (scholarship notices, medical reports, government schemes, job offers, utility bills, rent deeds) and transforms them into simple explanations, actionable quest checklists, and scheduled reminders in your language.
+            </div>
+          </div>
+
+          <div class="faq-item reveal">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>How does the Sarvam AI multilingual voice feature work?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              We leverage Sarvam AI's speech-to-text (STT) and text-to-speech (TTS) engines optimized specifically for Indian languages and accents. Users can speak naturally in Hindi, Marathi, Tamil, Telugu, and 6 other regional languages, and LifeBridge speaks the explanation back aloud without requiring them to read legal jargon.
+            </div>
+          </div>
+
+          <div class="faq-item reveal">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>Can it tell me whether I’m eligible for a scheme?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              LifeBridge extracts and clearly explains the eligibility criteria stated in the document (such as age cutoffs, income limits, or required land documents). You can check your details against those criteria, but final approval is determined by the issuing government department.
+            </div>
+          </div>
+
+          <div class="faq-item reveal">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>Is my uploaded document stored or used for AI training?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              No. Documents analyzed in this web demonstration run in your browser sandbox. In production, documents are encrypted, processed ephemerally for entity extraction, and stored only in your private vault. We never sell your personal records or use them to train public foundation models.
+            </div>
+          </div>
+
+          <div class="faq-item reveal">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>Does LifeBridge submit applications for me?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-body">
+              No. LifeBridge helps you prepare by organizing your checklist, finding verified official links, and flagging deadlines. You maintain complete control and submit your applications directly through authorized official portals.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION: FINAL CTA ──────────────────────────────────── -->
+    <section id="final-cta" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="final-cta-box reveal">
+          <div class="eyebrow eyebrow-dark">GAME OVER FOR CONFUSING PDFS</div>
+          <h2 id="cta-title">Your PDF isn’t going to decode itself. 👀</h2>
+          <p>Bring the confusing document. Leave with a clear, verified action plan.</p>
+
+          <div class="cta-buttons">
+            <a href="#demo" class="btn btn-lime">Decode My Document ↗</a>
+            <button class="btn btn-white preset-launcher" data-preset="scholarship">Try the Sample Demo</button>
+          </div>
+
+          <div class="final-annotation">
+            Side quests are optional. Understanding your paperwork shouldn’t be.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── FOOTER ──────────────────────────────────────────────── -->
+  <footer id="footer" role="contentinfo">
+    <div class="container-wide">
+      
+      <div class="footer-grid">
+        
+        <div class="footer-brand">
+          <h4>
+            <span class="logo-badge" style="width:28px;height:28px;font-size:0.8rem;">LB</span>
+            LifeBridge
+          </h4>
+          <p>
+            The AI Life Operating System that turns confusing official paperwork into simple explanations, verified workflows, and calendar reminders.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Product</h5>
+          <ul class="footer-links">
+            <li><a href="#pain">The Problem</a></li>
+            <li><a href="#vs-chatgpt">Workflow vs Chat</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#demo">Interactive Demo</a></li>
+            <li><a href="#pillars">Life OS Vault</a></li>
+            <li><a href="#sarvam-voice">Voice in 10+ Languages</a></li>
+            <li><a href="#pricing">Pricing Plans</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Resources</h5>
+          <ul class="footer-links">
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#hero">Back to top</a></li>
+            <li><a href="mailto:hello@lifebridge.app">Support & Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Legal & Trust</h5>
+          <ul class="footer-links">
+            <li><a id="open-privacy-btn">Privacy Policy</a></li>
+            <li><a id="open-terms-btn">Terms of Service</a></li>
+            <li><a href="#trust">Security & Trust</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 LifeBridge. Any Document. Any Language. Real Guidance.
+        </div>
+        <div class="footer-signoff">
+          Made to make paperwork less of a personality trait.
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ── MODAL: PRIVACY POLICY ──────────────────────────────── -->
+  <div class="modal-overlay" id="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="close-privacy-btn" aria-label="Close dialog">&times;</button>
+      <h3 id="privacy-modal-title">Privacy Policy</h3>
+      <p><strong>Effective Date: October 2026</strong></p>
+      <p>At LifeBridge, your paperwork privacy is non-negotiable. Official documents often contain sensitive personal information, and our architecture is designed to respect and protect your data.</p>
+      <h4>1. Zero-Retention Client Demos</h4>
+      <p>Documents uploaded to this interactive web demonstration are processed entirely in-memory within your local browser session. No files or text are transmitted to permanent remote databases.</p>
+      <h4>2. Ephemeral Production Analysis</h4>
+      <p>When using our authenticated mobile or backend services, files are analyzed in temporary encrypted compute environments for text parsing and entity extraction. Once your action checklist is returned to your device, source files are purged.</p>
+      <h4>3. No Data Selling or Public Training</h4>
+      <p>We do not sell personal data, nor do we use your private government notices or certificates to train public AI foundation models.</p>
+      <button class="btn btn-primary btn-sm" id="ack-privacy-btn" style="margin-top:10px;">Got it, thanks</button>
+    </div>
+  </div>
+
+  <!-- ── MODAL: TERMS OF SERVICE ────────────────────────────── -->
+  <div class="modal-overlay" id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="close-terms-btn" aria-label="Close dialog">&times;</button>
+      <h3 id="terms-modal-title">Terms of Service</h3>
+      <p><strong>Effective Date: October 2026</strong></p>
+      <h4>1. Informational & Reading Assistance Only</h4>
+      <p>LifeBridge is an artificial intelligence reading assistant created to help parse and summarize complex paperwork. It does not provide legal advice, financial counseling, or official government certifications.</p>
+      <h4>2. Verification of Deadlines and Criteria</h4>
+      <p>While LifeBridge strives for maximum extraction precision, users must always verify critical application deadlines, eligibility criteria, and fee structures against the original government circular or official department portal before submitting applications.</p>
+      <h4>3. Safe Usage</h4>
+      <p>You agree not to upload malicious software, unauthorized documents belonging to third parties without consent, or restricted national security materials.</p>
+      <button class="btn btn-primary btn-sm" id="ack-terms-btn" style="margin-top:10px;">I understand</button>
+    </div>
+  </div>
+
+  <!-- ── TOAST NOTIFICATION ─────────────────────────────────── -->
+  <div class="toast-pill" id="toast-pill" role="status" aria-live="polite">
+    <span id="toast-text">Checklist updated!</span>
+  </div>
+
+  <!-- ── JAVASCRIPT LOGIC ───────────────────────────────────── -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      /* ── 4 VS CHATGPT EXAMPLES DATA ──────────────────────────── */
+      const VS_EXAMPLES = {
+        govt: {
+          chatgptTitle: "ChatGPT on Government Notice",
+          chatgptText: "“Here is a summary of the Maharashtra scholarship scheme. It requires candidates to be in their 2nd year and have family income below ₹3.5 Lakh. Please see the official circular for more details.”\n\n(Conversation ends. Closes tab.)",
+          lifebridgeTitle: "LifeBridge on Government Notice",
+          lifebridgeText: "✅ You qualify! (CGPA & income verified)\n📋 Document Checklist:\n   • Tehsildar-signed Income Certificate\n   • Annexure Form 4B signed by Principal\n   • Sem 1 & 2 attested transcripts\n⏰ Deadline: 31st October (Reminder set!)\n🔗 Direct link saved to state portal\n📁 Categorized in Vault > Education"
+        },
+        job: {
+          chatgptTitle: "ChatGPT on Job Offer Letter",
+          chatgptText: "“The letter offers you ₹8,50,000 per annum with standard benefits and 30 days notice period.”\n\n(No mention of non-compete clauses, probation length, or documents needed on day one.)",
+          lifebridgeTitle: "LifeBridge on Job Offer Letter",
+          lifebridgeText: "🎯 Key Highlights:\n   • Joining Date: 1st Nov 2026\n   • Probation: 6 months with 15-day exit clause\n   ⚠ Flagged: 1-year non-compete clause in Clause 9.2\n📋 Day 1 Joining Checklist:\n   • Relieving letter from previous employer\n   • 3 months payslips + canceled cheque\n⏰ Resignation notice reminder set for current job"
+        },
+        medical: {
+          chatgptTitle: "ChatGPT on Medical Report",
+          chatgptText: "“Your blood test shows slightly elevated SGPT (ALT) and normal fasting blood sugar.”\n\n(No doctor questions, no comparison with last year's report, no sharing with family.)",
+          lifebridgeTitle: "LifeBridge on Medical Report",
+          lifebridgeText: "🩺 Plain Words: Liver enzyme SGPT is slightly elevated (54 U/L vs normal 40 U/L).\n💬 Questions for your Doctor:\n   1. 'Could my current medication be causing this enzyme rise?'\n   2. 'Do I need an ultrasound or follow-up test in 3 months?'\n📊 Vault Comparison: SGPT was 38 U/L in Oct 2025 (42% increase flagged).\n👨‍👩‍👧 Shared with family doctor & vault."
+        },
+        rental: {
+          chatgptTitle: "ChatGPT on Rental Agreement",
+          chatgptText: "“This is a 11-month lease agreement with monthly rent of ₹28,000 and security deposit of ₹80,000.”\n\n(Doesn't notice deposit deduction penalty or renewal notice cutoff.)",
+          lifebridgeTitle: "LifeBridge on Rental Agreement",
+          lifebridgeText: "⚠ Critical Traps Flagged:\n   • Auto-renewal with 10% rent escalation on Month 12\n   • Mandatory 60-day vacating notice (not 30 days)\n   • Non-refundable painting charge of ₹12,000 on exit\n⏰ Calendar reminder created 75 days before lease ends\n📁 Address updated in personal vault."
+        }
+      };
+
+      function renderVsExample(key) {
+        const data = VS_EXAMPLES[key];
+        const container = document.getElementById('example-content-display');
+        container.innerHTML = `
+          <div class="ex-pane">
+            <div class="ex-pane-title">❌ ${data.chatgptTitle}</div>
+            <div style="font-family:var(--font-mono); font-size:0.86rem; color:#D1D5DB; line-height:1.6; white-space:pre-wrap;">${data.chatgptText}</div>
+          </div>
+          <div class="ex-pane lifebridge-pane">
+            <div class="ex-pane-title">✅ ${data.lifebridgeTitle}</div>
+            <div style="font-family:var(--font-mono); font-size:0.86rem; color:#D8F56A; line-height:1.6; white-space:pre-wrap;">${data.lifebridgeText}</div>
+          </div>
+        `;
+      }
+
+      document.querySelectorAll('.ex-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.ex-tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderVsExample(btn.dataset.ex);
+        });
+      });
+      renderVsExample('govt');
+
+      /* ── 4 DEMO PRESETS DATA ─────────────────────────────────── */
+      const DEMO_PRESETS = {
+        scholarship: {
+          title: "Govt. Circular No. DHE-8821",
+          sourceText: `DEPT. OF HIGHER & TECHNICAL EDUCATION — MAHARASHTRA
+NOTIFICATION NO: DHE/SCHOL/2026/UG-8821
+DATE: 12TH AUGUST 2026
+
+SUBJECT: Post-Matriculation Merit-cum-Means Financial Assistance 2026-27.
+
+Applications are hereby invited from eligible second-year undergraduate degree candidates for financial disbursement under Scheme 4B.
+
+1. CRITICAL ELIGIBILITY PREREQUISITES:
+   (i) Candidate must be enrolled full-time in an affiliated university/autonomous college.
+   (ii) Minimum aggregate score of 70.00% (or equivalent 7.50 CGPA) in the first year of study.
+   (iii) Annual household gross income from all verified sources MUST NOT EXCEED INR 3,50,000/- per annum.
+
+2. MANDATORY DOCUMENTARY VERIFICATION:
+   Candidates shall furnish:
+   - Form 4B signed by the Head of Institution.
+   - Income Certificate issued strictly by an officer not below the rank of Tehsildar (valid for AY 2026-27).
+   - Grade transcript for semesters 1 & 2 attested by Controller of Examinations.
+
+3. SUBMISSION PROCEDURE & FINAL CLOSING DATES:
+   Strict online submission via state scholarship portal before 31st October 2026, 11:59 PM IST.
+   Physical documents must reach the district scrutiny committee by 15th November 2026.
+   *NOTE: Defective applications or unverified annexures shall be summarily rejected without hearing.*`,
+          discrepancy: "Smart Vault Notice: Your uploaded Aadhaar on file has address in Pune, but college certification lists Mumbai. Verification may need Bonafide Certificate.",
+          summary: {
+            en: "You qualify! Family income is verified under ₹3.5 Lakh/year, and your 1st-year CGPA satisfies the 70% merit threshold.",
+            hi: "आप पात्र हैं! पारिवारिक आय ₹3.5 लाख/वर्ष से कम सत्यापित है, और आपका प्रथम वर्ष का CGPA 70% की शर्त पूरी करता है।",
+            mr: "तुम्ही पात्र आहात! कौटुंबिक उत्पन्न ₹3.5 लाख/वर्षापेक्षा कमी आहे आणि तुमची पहिल्या वर्षाची टक्केवारी 70% निकष पूर्ण करते.",
+            ta: "நீங்கள் தகுதி பெற்றுள்ளீர்கள்! குடும்ப வருமானம் ஆண்டுக்கு ₹3.5 லட்சத்திற்குள் உள்ளது மற்றும் 70% தகுதி பூர்த்தியடைந்துள்ளது.",
+            te: "మీరు అర్హులు! కుటుంబ వార్షిక ఆదాయం ₹3.5 లక్షల లోపు ఉంది మరియు 70% మార్కుల అర్హత సరిపోయింది."
+          },
+          items: [
+            "Check eligibility: 2nd-year undergraduate with min 70% (7.5 CGPA)",
+            "Verify family income is under ₹3,50,000 / year",
+            "Get Tehsildar-signed Income Certificate (valid for 2026-27)",
+            "Obtain college principal signature on Annexure Form 4B",
+            "Submit online before October 31, 2026 (11:59 PM IST)"
+          ],
+          deadline: "31st October 2026",
+          category: "Vault > Education > Scholarships",
+          audioLang: "Hindi"
+        },
+        scheme: {
+          title: "Agri Dept. Scheme Notification AG/2026/SOLAR-PUMP",
+          sourceText: `DEPARTMENT OF AGRICULTURE & FARMERS WELFARE
+NOTIFICATION REF: AGRI-SOLAR/2026/PHASE-3
+DATE: 4TH JULY 2026
+
+SUBJECT: Subsidized Solar Water Pump Installation Scheme for Small Farmers.
+
+Under the state clean irrigation mission, small and marginal farmers with up to 5 acres of agricultural land are eligible for 60% capital cost subsidy.
+
+1. ELIGIBILITY:
+   - Must hold registered agricultural land in own name (documented via 7/12 extract).
+   - No pre-existing active grid power irrigation connection on the identified survey number.
+   - Bank account linked with Aadhaar NPCI mapper.
+
+2. ATTACHMENT REQUIREMENTS:
+   - Land 7/12 extract and 8-A certificate issued within past 3 months.
+   - NOC from State Electricity Distribution Company (MSEDCL).
+   - Self-declaration of non-receipt of previous solar benefits.
+
+3. CLOSING DATE:
+   Applications processed strictly on first-come-first-served basis until 30th November 2026.`,
+          discrepancy: "Smart Vault Notice: Verified survey number 142/B matches your stored 7/12 land extract. Electricity discom NOC is still pending in vault.",
+          summary: {
+            en: "Provides 60% capital subsidy on solar water pumps for farmers with under 5 acres without active grid connections.",
+            hi: "5 एकड़ तक भूमि वाले किसानों के लिए सोलर वाटर पंप स्थापना पर 60% सरकारी सब्सिडी प्रदान करता है।",
+            mr: "5 एकरांपर्यंत शेती असलेल्या शेतकऱ्यांसाठी सौर कृषी पंपावर 60% शासकीय अनुदान उपलब्ध आहे.",
+            ta: "5 ஏக்கருக்குள் நிலம் உள்ள விவசாயிகளுக்கு சோலார் தண்ணீர் பம்பு அமைக்க 60% மானியம் வழங்கப்படுகிறது.",
+            te: "5 ఎకరాల లోపు భూమి ఉన్న రైతులకు సోలార్ పంపు కోసం 60% సబ్సిడీ లభిస్తుంది."
+          },
+          items: [
+            "Confirm land ownership is 5 acres or less with valid 7/12 extract",
+            "Ensure no active electric connection on surveyed farm plot",
+            "Obtain fresh 3-month land record (7/12 & 8-A) from Talathi",
+            "Get NOC from State Electricity Distribution Company (MSEDCL)",
+            "Submit on portal before November 30, 2026 (First-come basis)"
+          ],
+          deadline: "30th November 2026",
+          category: "Vault > Agriculture > Solar Schemes",
+          audioLang: "Marathi"
+        },
+        job: {
+          title: "Tech Services Job Offer — Ref TS/2026/OFFER-14",
+          sourceText: `INFRA TECH ENTERPRISES PVT LTD
+CONFIDENTIAL OFFER OF EMPLOYMENT
+DATE: 18TH SEPTEMBER 2026
+
+Dear Candidate,
+We are pleased to offer you the position of Senior Systems Engineer at our Pune Technology Centre.
+
+1. COMPENSATION & COMMENCEMENT:
+   - Annual CTC: INR 14,50,000/- (Fixed: 12,00,000 / Variable: 2,50,000).
+   - Reporting Date: 1st November 2026, 9:30 AM IST.
+
+2. PROBATION & NOTICE PERIOD:
+   - Probationary period of 6 months.
+   - During probation, notice period is 15 days by either party.
+   - Upon confirmation, notice period is 60 calendar days.
+
+3. RESTRICTIVE COVENANTS (CLAUSE 9.2):
+   Candidate shall not solicit clients or engage with direct competitors for a period of 12 months post-termination.
+
+4. MANDATORY DAY-1 SUBMISSIONS:
+   Relieving letter from previous organization, Form 16, and attested degree certificates.`,
+          discrepancy: "Smart Vault Notice: Notice period at your current employer is 30 days. Joining date of 1st Nov gives you a safe 10-day buffer.",
+          summary: {
+            en: "Senior Engineer offer at ₹14.5L CTC. Highlights: Joining Nov 1st, 6-month probation, and a 12-month post-exit non-compete clause.",
+            hi: "सीनियर इंजीनियर का ऑफर ₹14.5 लाख CTC पर। मुख्य बिंदु: 1 नवंबर को जॉइनिंग, 6 महीने प्रोबेशन और 12 महीने का नॉन-कम्पीट क्लॉज।",
+            mr: "₹14.5 लाख CTC वर सिनियर इंजिनिअर पदाची ऑफर. 1 नोव्हेंबर रोजी जॉइनिंग, 6 महिने प्रोबेशन आणि 12 महिने नॉन-कम्पिट अट.",
+            ta: "ரூ.14.5 லட்சம் CTC-ல் சீனியர் இன்ஜினியர் ஆஃபர். நவம்பர் 1 இணைவு தேதி மற்றும் 6 மாத நன்னடத்தை காலம்.",
+            te: "₹14.5 లక్షల CTC తో సీనియర్ ఇంజనీర్ ఆఫర్. నవంబర్ 1న చేరిక తేదీ మరియు 6 నెలల ప్రొబేషన్ కాలం."
+          },
+          items: [
+            "Review Clause 9.2 (12-month non-compete restriction on competitors)",
+            "Submit resignation to current employer before October 1st",
+            "Collect Form 16 and Relieving Letter from current HR",
+            "Sign and return offer acceptance letter before Sept 25",
+            "Report to Pune Technology Centre on 1st November 2026 (9:30 AM)"
+          ],
+          deadline: "25th September 2026 (Acceptance)",
+          category: "Vault > Career > Job Offers",
+          audioLang: "English"
+        },
+        medical: {
+          title: "Comprehensive Metabolic & Liver Diagnostic Panel",
+          sourceText: `METROPOLIS ADVANCED DIAGNOSTICS LAB
+PATIENT ID: MET-99821 | AGE: 38 | GENDER: MALE
+DATE OF COLLECTION: 02 OCTOBER 2026
+
+TEST DESCRIPTION               RESULT       UNIT       REFERENCE RANGE
+Serum Bilirubin (Total)        0.9          mg/dL      0.2 - 1.2  [NORMAL]
+SGPT / ALT (Liver Enzyme)      54.0         U/L        10.0 - 40.0 [ELEVATED]
+SGOT / AST (Liver Enzyme)      36.0         U/L        10.0 - 38.0 [NORMAL]
+Serum Alkaline Phosphatase     85.0         U/L        44.0 - 147.0 [NORMAL]
+Fasting Plasma Glucose         94.0         mg/dL      70.0 - 100.0 [NORMAL]
+Serum Creatinine               0.92         mg/dL      0.7 - 1.3  [NORMAL]
+
+PATHOLOGIST REMARKS:
+Mild isolated elevation of Alanine Aminotransferase (ALT/SGPT). Clinical correlation with lifestyle, medications, and hepatology evaluation recommended.`,
+          discrepancy: "Smart Vault Notice: Compared to your October 2025 health checkup in Vault (SGPT was 38 U/L), this is a 42% elevation. Blood sugar remains stable.",
+          summary: {
+            en: "Everything is normal except your liver enzyme SGPT (ALT), which is slightly high at 54 U/L (normal is up to 40 U/L).",
+            hi: "लीवर एंजाइम SGPT (ALT) को छोड़कर बाकी सभी रिपोर्ट सामान्य है, जो 54 U/L है (सामान्य सीमा 40 तक होती है)।",
+            mr: "लिव्हर एन्झाईम SGPT (ALT) वगळता सर्व चाचण्या सामान्य आहेत. SGPT 54 U/L आहे (सामान्य मर्यादा 40 पर्यंत असते).",
+            ta: "கல்லீரல் என்சைம் SGPT (54 U/L) சற்று அதிகமாக இருப்பதைத் தவிர மற்ற சோதனைகள் அனைத்தும் இயல்பாக உள்ளன.",
+            te: "కాలేయ ఎంజైమ్ SGPT (54 U/L) కొద్దిగా పెరగడం మినహా మిగిలిన అన్ని నివేదికలు సాధారణంగా ఉన్నాయి."
+          },
+          items: [
+            "Ask doctor: 'Could my current supplements or painkillers cause this SGPT rise?'",
+            "Ask doctor: 'Do I need an abdominal ultrasound or repeat blood test in 3 months?'",
+            "Maintain hydration and minimize processed foods for next 30 days",
+            "Store report in family health archive and share with physician"
+          ],
+          deadline: "Follow-up test recommended in 90 days",
+          category: "Vault > Healthcare > Lab Reports",
+          audioLang: "Hindi"
+        }
+      };
+
+      let currentPresetKey = 'scholarship';
+      let currentLang = 'en';
+      let isAudioPlaying = false;
+
+      /* ── ELEMENT REFS ────────────────────────────────────────── */
+      const navbar = document.getElementById('navbar');
+      const hamburgerBtn = document.getElementById('hamburger-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const tabBtnOriginal = document.getElementById('tab-btn-original');
+      const tabBtnOutput = document.getElementById('tab-btn-output');
+      const paneOriginal = document.getElementById('pane-original');
+      const paneOutput = document.getElementById('pane-output');
+      const originalDocText = document.getElementById('original-doc-text');
+      const docSourceMeta = document.getElementById('doc-source-meta');
+      const outputSummaryText = document.getElementById('output-summary-text');
+      const outputDeadlineText = document.getElementById('output-deadline-text');
+      const vaultAlertText = document.getElementById('vault-alert-text');
+      const vaultCategoryText = document.getElementById('vault-category-text');
+      const questChecklistItems = document.getElementById('quest-checklist-items');
+      const progressText = document.getElementById('progress-text');
+      const progressFill = document.getElementById('progress-fill');
+      const resetDemoBtn = document.getElementById('reset-demo-btn');
+      const uploadDropzone = document.getElementById('upload-dropzone');
+      const fileUploadInput = document.getElementById('file-upload-input');
+      const browseFileBtn = document.getElementById('browse-file-btn');
+      const uploadStatusDisplay = document.getElementById('upload-status-display');
+      const toastPill = document.getElementById('toast-pill');
+      const toastText = document.getElementById('toast-text');
+      const audioPlayBtn = document.getElementById('audio-play-btn');
+      const audioStatusLabel = document.getElementById('audio-status-label');
+      const soundWaveAnim = document.getElementById('sound-wave-anim');
+
+      /* ── TOAST NOTIFICATION HELPER ───────────────────────────── */
+      let toastTimeout;
+      function showToast(message) {
+        toastText.textContent = message;
+        toastPill.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toastPill.classList.remove('show');
+        }, 2800);
+      }
+
+      /* ── SCROLL NAVBAR ───────────────────────────────────────── */
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 20);
+      }, { passive: true });
+
+      /* ── MOBILE MENU ─────────────────────────────────────────── */
+      hamburgerBtn.addEventListener('click', () => {
+        const isOpen = mobileMenu.classList.toggle('open');
+        hamburgerBtn.classList.toggle('open', isOpen);
+        hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
+      });
+      document.querySelectorAll('.mobile-link').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.remove('open');
+          hamburgerBtn.classList.remove('open');
+          hamburgerBtn.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      /* ── TAB SWITCHER ────────────────────────────────────────── */
+      function setTabState(state) {
+        if (state === 'original') {
+          paneOriginal.style.display = 'block';
+          paneOutput.style.display = 'none';
+          tabBtnOriginal.classList.add('active');
+          tabBtnOriginal.setAttribute('aria-selected', 'true');
+          tabBtnOutput.classList.remove('active');
+          tabBtnOutput.setAttribute('aria-selected', 'false');
+        } else {
+          paneOriginal.style.display = 'none';
+          paneOutput.style.display = 'block';
+          tabBtnOutput.classList.add('active');
+          tabBtnOutput.setAttribute('aria-selected', 'true');
+          tabBtnOriginal.classList.remove('active');
+          tabBtnOriginal.setAttribute('aria-selected', 'false');
+        }
+      }
+      tabBtnOriginal.addEventListener('click', () => setTabState('original'));
+      tabBtnOutput.addEventListener('click', () => setTabState('output'));
+
+      /* ── LOAD PRESET DATA ────────────────────────────────────── */
+      function loadPreset(key, switchToOutput = false) {
+        currentPresetKey = key;
+        const preset = DEMO_PRESETS[key];
+        if (!preset) return;
+
+        stopAudio();
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.preset === key);
+        });
+
+        docSourceMeta.textContent = preset.title;
+        originalDocText.textContent = preset.sourceText;
+        vaultAlertText.innerHTML = `<strong>Smart Vault Notice:</strong> ${preset.discrepancy.replace('Smart Vault Notice: ', '')}`;
+        vaultCategoryText.textContent = preset.category;
+        outputDeadlineText.textContent = preset.deadline;
+        audioStatusLabel.textContent = `🔊 Listen in ${preset.audioLang} (Powered by Sarvam TTS)`;
+
+        updateSummaryText();
+
+        // Build checklist items
+        questChecklistItems.innerHTML = '';
+        preset.items.forEach((itemText, idx) => {
+          const li = document.createElement('li');
+          li.className = 'quest-item';
+          const id = `check-${key}-${idx}`;
+          li.innerHTML = `
+            <input type="checkbox" id="${id}" />
+            <label for="${id}" class="item-text">${itemText}</label>
+          `;
+          questChecklistItems.appendChild(li);
+        });
+
+        attachChecklistEvents();
+        updateProgress();
+
+        if (switchToOutput) {
+          setTabState('output');
+        }
+
+        showToast(`Loaded: ${preset.title}`);
+      }
+
+      function updateSummaryText() {
+        const preset = DEMO_PRESETS[currentPresetKey];
+        if (!preset) return;
+        outputSummaryText.textContent = preset.summary[currentLang] || preset.summary.en;
+      }
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          loadPreset(btn.dataset.preset);
+        });
+      });
+
+      document.querySelectorAll('.preset-launcher').forEach(btn => {
+        btn.addEventListener('click', () => {
+          loadPreset(btn.dataset.preset || 'scholarship', true);
+          const demo = document.getElementById('demo');
+          if (demo) {
+            const top = demo.getBoundingClientRect().top + window.scrollY - 64;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        });
+      });
+
+      /* ── LANGUAGE SWITCHER ───────────────────────────────────── */
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentLang = btn.dataset.lang;
+          updateSummaryText();
+          showToast(`Language switched to ${btn.textContent}`);
+        });
+      });
+
+      /* ── SARVAM AUDIO SYNTHESIS SIMULATOR ────────────────────── */
+      function stopAudio() {
+        isAudioPlaying = false;
+        audioPlayBtn.textContent = '▶';
+        soundWaveAnim.style.display = 'none';
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+      }
+
+      audioPlayBtn.addEventListener('click', () => {
+        if (isAudioPlaying) {
+          stopAudio();
+          showToast('Audio paused');
+          return;
+        }
+
+        isAudioPlaying = true;
+        audioPlayBtn.textContent = '⏸';
+        soundWaveAnim.style.display = 'flex';
+        showToast(`Playing audio via Sarvam TTS (${DEMO_PRESETS[currentPresetKey].audioLang})`);
+
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const textToSpeak = outputSummaryText.textContent;
+          const utterance = new SpeechSynthesisUtterance(textToSpeak);
+          utterance.rate = 0.95;
+          utterance.onend = () => stopAudio();
+          utterance.onerror = () => stopAudio();
+          window.speechSynthesis.speak(utterance);
+        } else {
+          setTimeout(() => stopAudio(), 4000);
+        }
+      });
+
+      /* ── VOICE BUTTON SIMULATION (SECTION SARVAM) ────────────── */
+      const voiceBtn = document.getElementById('voice-simulate-btn');
+      const voiceStatus = document.getElementById('voice-status-text');
+      if (voiceBtn) {
+        voiceBtn.addEventListener('click', () => {
+          voiceBtn.style.transform = 'scale(1.15)';
+          voiceStatus.innerHTML = '<span style="color:var(--acid-lime);">🎙️ Listening in Hindi... "Scholarship deadline kab hai?"</span>';
+          showToast('🎙️ Sarvam STT: Voice recognized');
+
+          setTimeout(() => {
+            voiceStatus.innerHTML = '<span style="color:#A3E635;">🧠 Gemini AI: Extracted deadline: 31st October 2026</span>';
+          }, 1000);
+
+          setTimeout(() => {
+            voiceStatus.innerHTML = '<span style="color:#D8F56A;">🔊 Sarvam TTS: "Aavedan 31 October raat 11:59 tak bharna hoga."</span>';
+            voiceBtn.style.transform = '';
+            showToast('🔊 Sarvam TTS: Audio explanation delivered');
+          }, 2200);
+        });
+      }
+
+      /* ── CHECKLIST PROGRESS COUNTER ──────────────────────────── */
+      function attachChecklistEvents() {
+        questChecklistItems.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          cb.addEventListener('change', () => {
+            const parentLi = cb.closest('.quest-item');
+            parentLi.classList.toggle('checked', cb.checked);
+            updateProgress();
+          });
+        });
+      }
+
+      function updateProgress() {
+        const total = questChecklistItems.querySelectorAll('input[type="checkbox"]').length;
+        const checked = questChecklistItems.querySelectorAll('input[type="checkbox"]:checked').length;
+        progressText.textContent = `${checked} / ${total} completed`;
+        const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
+        progressFill.style.width = `${pct}%`;
+
+        if (checked === total && total > 0) {
+          showToast('🎉 All quests completed! You conquered this document!');
+        }
+      }
+
+      resetDemoBtn.addEventListener('click', () => {
+        questChecklistItems.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          cb.checked = false;
+          cb.closest('.quest-item').classList.remove('checked');
+        });
+        updateProgress();
+        showToast('↺ Demo checklist reset');
+      });
+
+      /* ── UPLOAD DROP ZONE SIMULATOR ──────────────────────────── */
+      browseFileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileUploadInput.click();
+      });
+
+      uploadDropzone.addEventListener('click', () => {
+        fileUploadInput.click();
+      });
+
+      ['dragenter', 'dragover'].forEach(ev => {
+        uploadDropzone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          uploadDropzone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(ev => {
+        uploadDropzone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          uploadDropzone.classList.remove('dragover');
+          if (ev === 'drop' && e.dataTransfer.files.length) {
+            handleFileUpload(e.dataTransfer.files[0]);
+          }
+        });
+      });
+
+      fileUploadInput.addEventListener('change', () => {
+        if (fileUploadInput.files.length) {
+          handleFileUpload(fileUploadInput.files[0]);
+        }
+      });
+
+      const ALLOWED_MIME = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'];
+
+      function handleFileUpload(file) {
+        uploadStatusDisplay.className = 'upload-status-box';
+
+        // 1. Validate file extension / type
+        const isValidType = ALLOWED_MIME.includes(file.type) || file.name.match(/\.(pdf|png|jpe?g|webp)$/i);
+        if (!isValidType) {
+          uploadStatusDisplay.className = 'upload-status-box error';
+          uploadStatusDisplay.innerHTML = '⚠️ <strong>Unsupported format.</strong> Please upload a PDF, PNG, JPG, or WEBP document.';
+          return;
+        }
+
+        // 2. Validate file size (max 10MB)
+        const maxBytes = 10 * 1024 * 1024;
+        if (file.size > maxBytes) {
+          uploadStatusDisplay.className = 'upload-status-box error';
+          uploadStatusDisplay.innerHTML = '⚠️ <strong>File too large.</strong> Maximum allowed size is 10 MB.';
+          return;
+        }
+
+        // 3. Simulated Scanning Sequence
+        uploadStatusDisplay.className = 'upload-status-box scanning';
+        uploadStatusDisplay.innerHTML = `⏳ <strong>Scanning "${file.name}"...</strong> OCR reading & detecting clauses.`;
+
+        setTimeout(() => {
+          uploadStatusDisplay.innerHTML = `🔍 <strong>Classifying document...</strong> Categorizing into Life OS Vault & cross-checking records.`;
+        }, 1100);
+
+        setTimeout(() => {
+          uploadStatusDisplay.className = 'upload-status-box success';
+          uploadStatusDisplay.innerHTML = `✓ <strong>Document Decoded!</strong> Successfully parsed "${file.name}". See LifeBridge output tab.`;
+          
+          docSourceMeta.textContent = file.name;
+          originalDocText.textContent = `[EXTRACTED OCR TEXT FROM: ${file.name}]\n\n--- DOCUMENT HEADER ---\nDocument parsed successfully in local sandbox.\nFile size: ${(file.size / 1024).toFixed(1)} KB.\n\nSummary & Quest checklist synthesized into human-readable steps.`;
+          
+          outputSummaryText.textContent = `Document "${file.name}" processed. LifeBridge extracted 4 required certificates, 1 submission deadline, and verified eligibility clauses.`;
+          vaultAlertText.innerHTML = `<strong>Smart Vault Notice:</strong> Verified new record "${file.name}" against your existing documents. No critical conflicts found.`;
+          vaultCategoryText.textContent = "Vault > Ingestion > Recent Scans";
+
+          setTabState('output');
+          showToast(`✓ Decoded ${file.name}!`);
+        }, 2200);
+      }
+
+      /* ── ACCORDION FAQ ───────────────────────────────────────── */
+      document.querySelectorAll('.faq-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const item = trigger.closest('.faq-item');
+          const isOpen = item.classList.contains('open');
+
+          document.querySelectorAll('.faq-item.open').forEach(el => {
+            el.classList.remove('open');
+            el.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
+          });
+
+          if (!isOpen) {
+            item.classList.add('open');
+            trigger.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      /* ── MODALS (Privacy & Terms & Family) ───────────────────── */
+      const privacyModal = document.getElementById('privacy-modal');
+      const termsModal = document.getElementById('terms-modal');
+
+      function openModal(modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeModal(modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      document.getElementById('open-privacy-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal(privacyModal);
+      });
+      document.getElementById('close-privacy-btn').addEventListener('click', () => closeModal(privacyModal));
+      document.getElementById('ack-privacy-btn').addEventListener('click', () => closeModal(privacyModal));
+
+      document.getElementById('open-terms-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal(termsModal);
+      });
+      document.getElementById('close-terms-btn').addEventListener('click', () => closeModal(termsModal));
+      document.getElementById('ack-terms-btn').addEventListener('click', () => closeModal(termsModal));
+
+      const familyBtn = document.getElementById('family-plan-btn');
+      if (familyBtn) {
+        familyBtn.addEventListener('click', () => {
+          showToast('Family Plan selected! Up to 6 profiles enabled.');
+        });
+      }
+
+      [privacyModal, termsModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal(modal);
+        });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal(privacyModal);
+          closeModal(termsModal);
+        }
+      });
+
+      /* ── SCROLL REVEAL OBSERVER ──────────────────────────────── */
+      const observerOptions = {
+        threshold: 0.05,
+        rootMargin: '0px 0px 60px 0px'
+      };
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.reveal').forEach(el => {
+        revealObserver.observe(el);
+      });
+
+      setTimeout(() => {
+        document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+          const rect = el.getBoundingClientRect();
+          if (rect.top < window.innerHeight) {
+            el.classList.add('visible');
+            revealObserver.unobserve(el);
+          }
+        });
+      }, 300);
+
+      /* ── INIT DEFAULT PRESET ─────────────────────────────────── */
+      loadPreset('scholarship');
+
+    });
+  </script>
+</body>
+</html>

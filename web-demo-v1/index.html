@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LifeBridge — Your Document OS</title>
+  <meta name="description" content="LifeBridge turns confusing paperwork into verified checklists, deadline reminders, and completed actions.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="bg-ambient" aria-hidden="true">
+    <div class="ambient-blob-1"></div>
+    <div class="ambient-blob-2"></div>
+    <div class="ambient-blob-3"></div>
+  </div>
+
+  <!-- Demo Mode Header (desktop only) -->
+  <header class="demo-header" id="demoHeader">
+    <div class="demo-header-brand">
+      <div class="demo-logo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      </div>
+      <span class="demo-header-title">LifeBridge</span>
+      <span class="demo-badge">DEMO</span>
+    </div>
+    <div class="demo-header-actions">
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        <span>Live Demo</span>
+      </div>
+      <select id="globalLangSelect" class="lang-pill" title="Language">
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+        <option value="mr">Marathi</option>
+        <option value="ta">Tamil</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Phone Frame Wrapper -->
+  <main class="phone-stage">
+    <div class="phone-frame" id="phoneFrame">
+
+      <!-- Phone Status Bar -->
+      <div class="status-bar">
+        <span class="status-time" id="statusTime">9:41</span>
+        <div class="status-notch"></div>
+        <div class="status-icons">
+          <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.05em;">5G</span>
+          <svg width="20" height="12" viewBox="0 0 24 16"><rect x="1" y="2" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="3" width="16" height="10" rx="1.5" fill="currentColor"/><path d="M22 6v4a2 2 0 0 0 0-4z" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <!-- App Screens Container -->
+      <div class="screens-wrapper" id="screensWrapper">
+
+        <!-- ====== SCREEN: HOME / DASHBOARD ====== -->
+        <div class="screen active" id="screen-home">
+          <div class="screen-scroll">
+
+            <!-- Home Header -->
+            <div class="home-header">
+              <div class="home-greeting">
+                <div class="avatar-circle">A</div>
+                <div>
+                  <div class="greeting-main" id="greetingText">Good morning, Arshad</div>
+                  <div class="greeting-sub">Your Document OS</div>
+                </div>
+              </div>
+              <button class="icon-btn" onclick="showUploadModal()" title="Add document" id="homeAddBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+            </div>
+
+            <!-- Urgent Alert Banner -->
+            <div class="urgent-banner" onclick="navigateTo('tasks')" id="urgentBanner">
+              <div class="urgent-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <div class="urgent-content">
+                <div class="urgent-title">2 Urgent Deadlines This Week</div>
+                <div class="urgent-sub">Scholarship closes Oct 31 &middot; Tax notice due Nov 5</div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+              <div class="stat-card" onclick="navigateTo('vault')">
+                <div class="stat-icon blue-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="stat-num">8</div>
+                <div class="stat-label">Documents</div>
+              </div>
+              <div class="stat-card" onclick="navigateTo('tasks')">
+                <div class="stat-icon amber-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <div class="stat-num">5</div>
+                <div class="stat-label">Pending</div>
+              </div>
+              <div class="stat-card" onclick="navigateTo('tasks')">
+                <div class="stat-icon red-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="stat-num red-num">2</div>
+                <div class="stat-label">Urgent</div>
+              </div>
+            </div>
+
+            <!-- Recent Documents -->
+            <div class="section-header">
+              <span class="section-title">Recent Documents</span>
+              <button class="section-link" onclick="navigateTo('vault')">See all</button>
+            </div>
+
+            <div id="recentDocList"></div>
+
+            <!-- Quick Actions -->
+            <div class="section-header" style="margin-top:4px;">
+              <span class="section-title">Quick Actions</span>
+            </div>
+            <div class="quick-actions-grid">
+              <button class="qa-btn" onclick="showUploadModal()" id="qaUploadBtn">
+                <span class="qa-icon">📄</span>
+                <span>Upload Doc</span>
+              </button>
+              <button class="qa-btn" onclick="navigateTo('chat')" id="qaAskBtn">
+                <span class="qa-icon">💬</span>
+                <span>Ask AI</span>
+              </button>
+              <button class="qa-btn" onclick="navigateTo('tasks')" id="qaTasksBtn">
+                <span class="qa-icon">✅</span>
+                <span>My Tasks</span>
+              </button>
+              <button class="qa-btn" onclick="navigateTo('vault')" id="qaVaultBtn">
+                <span class="qa-icon">🗂️</span>
+                <span>Open Vault</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ====== SCREEN: VAULT ====== -->
+        <div class="screen" id="screen-vault">
+          <div class="screen-scroll">
+            <div class="screen-topbar">
+              <h2 class="screen-title">Document Vault</h2>
+              <button class="icon-btn" onclick="showUploadModal()" id="vaultAddBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="filter-scroll">
+              <button class="filter-chip active" onclick="filterVault('all', this)" id="filterAll">All</button>
+              <button class="filter-chip" onclick="filterVault('education', this)" id="filterEdu">Education</button>
+              <button class="filter-chip" onclick="filterVault('medical', this)" id="filterMed">Medical</button>
+              <button class="filter-chip" onclick="filterVault('government', this)" id="filterGov">Government</button>
+              <button class="filter-chip" onclick="filterVault('financial', this)" id="filterFin">Financial</button>
+              <button class="filter-chip" onclick="filterVault('utility', this)" id="filterUtil">Utility</button>
+            </div>
+
+            <div id="vaultDocList"></div>
+          </div>
+        </div>
+
+        <!-- ====== SCREEN: TASKS ====== -->
+        <div class="screen" id="screen-tasks">
+          <div class="screen-scroll">
+            <div class="screen-topbar">
+              <h2 class="screen-title">Action Center</h2>
+              <span class="task-count-badge" id="taskCountBadge">5 Pending</span>
+            </div>
+
+            <!-- Progress Overview -->
+            <div class="progress-card">
+              <div class="progress-header">
+                <span>Overall Progress</span>
+                <span id="progressLabel">1 / 9 Done</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width:11%"></div>
+              </div>
+              <div class="progress-sub" id="progressSub">Keep going — you're building momentum!</div>
+            </div>
+
+            <!-- Urgent Tasks -->
+            <div class="section-header">
+              <span class="section-title">🔴 Urgent</span>
+            </div>
+            <div id="urgentTasksList"></div>
+
+            <!-- Normal Tasks -->
+            <div class="section-header" style="margin-top:6px;">
+              <span class="section-title">📋 Upcoming</span>
+            </div>
+            <div id="normalTasksList"></div>
+
+            <!-- Completed -->
+            <div class="section-header" style="margin-top:6px;">
+              <span class="section-title">✅ Completed</span>
+            </div>
+            <div id="doneTasksList"></div>
+          </div>
+        </div>
+
+        <!-- ====== SCREEN: CHAT / ASK AI ====== -->
+        <div class="screen" id="screen-chat">
+          <div class="chat-layout">
+            <div class="screen-topbar" style="padding:16px 18px 12px; flex-shrink:0;">
+              <div>
+                <h2 class="screen-title">Ask LifeBridge</h2>
+                <div class="chat-sub-label">AI-powered document Q&amp;A</div>
+              </div>
+              <div class="ai-status-pill">
+                <div class="live-dot"></div>
+                <span>AI Ready</span>
+              </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-msg ai-msg">
+                <div class="chat-avatar-ai">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                </div>
+                <div class="chat-bubble ai-bubble">
+                  <p>Hi Arshad! I can answer questions about any of your <strong>8 uploaded documents</strong>.</p>
+                  <p style="margin-top:8px;color:#64748b;font-size:0.85em;">Try: <em>"What's the scholarship deadline?"</em></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Suggested Prompts -->
+            <div class="suggestions-row" id="suggestionsRow">
+              <button class="suggestion-chip" onclick="sendSuggestedMsg(this)" data-msg="What's the deadline for my scholarship?">Scholarship deadline?</button>
+              <button class="suggestion-chip" onclick="sendSuggestedMsg(this)" data-msg="What documents do I need for the tax notice?">Tax notice docs?</button>
+              <button class="suggestion-chip" onclick="sendSuggestedMsg(this)" data-msg="Am I eligible for the scholarship?">Check eligibility</button>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-bar">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your documents..." autocomplete="off">
+              <button class="chat-send-btn" onclick="sendChatMessage()" id="chatSendBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== SCREEN: PROFILE ====== -->
+        <div class="screen" id="screen-profile">
+          <div class="screen-scroll">
+            <div class="screen-topbar">
+              <h2 class="screen-title">Profile</h2>
+            </div>
+
+            <!-- Profile Card -->
+            <div class="profile-card">
+              <div class="profile-avatar">A</div>
+              <div class="profile-name">Arshad</div>
+              <div class="profile-email">arshad@lifebridge.app</div>
+              <div class="profile-plan-badge">Free Plan &middot; 8/10 docs used</div>
+            </div>
+
+            <!-- Settings -->
+            <div class="settings-section-title">Preferences</div>
+            <div class="settings-list">
+              <div class="settings-item">
+                <div class="settings-icon">🌐</div>
+                <div class="settings-content">
+                  <div class="settings-label">Explanation Language</div>
+                  <div class="settings-value" id="currentLangLabel">English</div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="settings-item">
+                <div class="settings-icon">🔔</div>
+                <div class="settings-content">
+                  <div class="settings-label">Deadline Reminders</div>
+                  <div class="settings-value">3 days before</div>
+                </div>
+                <div class="toggle-switch on" id="reminderToggle" onclick="this.classList.toggle('on')"></div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-icon">🔒</div>
+                <div class="settings-content">
+                  <div class="settings-label">Auto-redact PII</div>
+                  <div class="settings-value">Aadhaar, PAN, Phone</div>
+                </div>
+                <div class="toggle-switch on" id="privacyToggle" onclick="this.classList.toggle('on')"></div>
+              </div>
+            </div>
+
+            <!-- Family Sharing -->
+            <div class="settings-section-title">Family Sharing</div>
+            <div class="family-card">
+              <div class="family-header">
+                <span class="family-header-label">2 Members</span>
+                <button class="family-add-btn">+ Add</button>
+              </div>
+              <div class="family-members">
+                <div class="family-member">
+                  <div class="fam-avatar purple-av">M</div>
+                  <div>
+                    <div class="fam-name">Mom</div>
+                    <div class="fam-role">Editor</div>
+                  </div>
+                </div>
+                <div class="family-member">
+                  <div class="fam-avatar cyan-av">B</div>
+                  <div>
+                    <div class="fam-name">Bhai</div>
+                    <div class="fam-role">Viewer</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upgrade Card -->
+            <div class="upgrade-card">
+              <div class="upgrade-icon">⚡</div>
+              <div class="upgrade-content">
+                <div class="upgrade-title">Upgrade to Pro</div>
+                <div class="upgrade-sub">Unlimited docs &middot; Voice (Sarvam AI) &middot; Family Sharing</div>
+              </div>
+              <button class="upgrade-btn" onclick="showToast('Pro upgrade coming soon!')">Upgrade</button>
+            </div>
+
+            <!-- App Info -->
+            <div class="app-info">
+              <div>LifeBridge v0.1.0 &middot; Demo Build</div>
+              <div style="margin-top:4px;color:var(--text-d);">Powered by Gemini &amp; Sarvam AI</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end screens-wrapper -->
+
+      <!-- Document Detail Modal -->
+      <div class="modal-overlay" id="docModal" onclick="closeDocModal(event)">
+        <div class="modal-sheet" id="docModalSheet">
+          <div class="modal-handle"></div>
+          <div id="docModalContent"></div>
+        </div>
+      </div>
+
+      <!-- Upload Modal -->
+      <div class="modal-overlay" id="uploadModal" onclick="closeUploadModal(event)">
+        <div class="modal-sheet" id="uploadModalSheet">
+          <div class="modal-handle"></div>
+          <div class="upload-modal-body" id="uploadContent">
+            <div class="upload-title">Add Document</div>
+            <div class="upload-zone" id="uploadZone" onclick="simulateUpload()">
+              <div class="upload-icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="upload-text">Tap to upload or photograph</div>
+              <div class="upload-hint">PDF, JPG, PNG &middot; Max 10 MB</div>
+            </div>
+            <div class="upload-options">
+              <div class="upload-option-row">
+                <span>📷</span><span>Take a photo of document</span>
+              </div>
+              <div class="upload-option-row">
+                <span>📁</span><span>Choose from files</span>
+              </div>
+              <div class="upload-option-row">
+                <span>🌐</span><span>Paste a link or URL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scanning Overlay -->
+      <div class="scan-overlay" id="scanOverlay">
+        <div class="scan-overlay-content">
+          <div class="scan-icon-pulse">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <div class="scan-title">Analyzing Document...</div>
+          <div class="scan-status" id="scanStatusMsg">Reading document structure...</div>
+          <div class="scan-progress-track">
+            <div class="scan-progress-fill" id="scanProgressFill"></div>
+          </div>
+          <div class="scan-meta-row">
+            <span>Gemini Multimodal</span>
+            <span>Encrypted</span>
+            <span>Private</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast -->
+      <div class="toast" id="toastEl" role="status" aria-live="polite">
+        <span id="toastMsg"></span>
+      </div>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" onclick="navigateTo('home')" id="nav-home">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
+          <div class="nav-dot"></div>
+        </button>
+        <button class="nav-item" onclick="navigateTo('vault')" id="nav-vault">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <span>Vault</span>
+          <div class="nav-dot"></div>
+        </button>
+        <button class="nav-item" onclick="navigateTo('tasks')" id="nav-tasks">
+          <div class="nav-badge" id="taskNavBadge">5</div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Tasks</span>
+          <div class="nav-dot"></div>
+        </button>
+        <button class="nav-item" onclick="navigateTo('chat')" id="nav-chat">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Ask AI</span>
+          <div class="nav-dot"></div>
+        </button>
+        <button class="nav-item" onclick="navigateTo('profile')" id="nav-profile">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+          <div class="nav-dot"></div>
+        </button>
+      </nav>
+
+    </div><!-- end phone-frame -->
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
