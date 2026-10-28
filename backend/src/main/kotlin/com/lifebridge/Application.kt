@@ -1,6 +1,7 @@
 package com.lifebridge
 
 import com.lifebridge.routes.healthRoute
+import com.lifebridge.routes.documentRoutes
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -71,7 +72,11 @@ fun Application.module() {
         }
     }
 
+    val repository = com.lifebridge.service.DocumentRepository()
+    val analysisService = com.lifebridge.service.DocumentAnalysisService()
+
     routing {
         healthRoute()
+        documentRoutes(repository, analysisService)
     }
 }

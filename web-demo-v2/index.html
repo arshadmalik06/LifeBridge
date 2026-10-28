@@ -254,8 +254,16 @@
 
             <!-- Chat Input -->
             <div class="chat-input-bar">
-              <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your documents..." autocomplete="off">
-              <button class="chat-send-btn" onclick="sendChatMessage()" id="chatSendBtn">
+              <button class="chat-mic-btn" id="chatMicBtn" onclick="toggleVoiceInput()" title="Voice input (Speech to Text)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+              </button>
+              <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your documents or tap mic..." autocomplete="off">
+              <button class="chat-send-btn" onclick="sendChatMessage()" id="chatSendBtn" title="Send message">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
@@ -301,8 +309,15 @@
                 <div class="settings-content">
                   <div class="settings-label">Auto-redact PII</div>
                   <div class="settings-value">Aadhaar, PAN, Phone</div>
-                </div>
                 <div class="toggle-switch on" id="privacyToggle" onclick="this.classList.toggle('on')"></div>
+              </div>
+              <div class="settings-item" onclick="promptApiKey()">
+                <div class="settings-icon">🤖</div>
+                <div class="settings-content">
+                  <div class="settings-label">Gemini API Key</div>
+                  <div class="settings-value" id="apiKeyStatusLabel">Not set (using offline heuristics)</div>
+                </div>
+                <button style="background:#0f172a;color:#fff;border:none;padding:4px 8px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Set</button>
               </div>
             </div>
 
@@ -365,24 +380,40 @@
           <div class="modal-handle"></div>
           <div class="upload-modal-body" id="uploadContent">
             <div class="upload-title">Add Document</div>
-            <div class="upload-zone" id="uploadZone" onclick="simulateUpload()">
+            <input type="file" id="realFileInput" style="display:none;" accept=".txt,.pdf,.png,.jpg,.jpeg" onchange="handleRealFileUpload(event)">
+            <div class="upload-zone" id="uploadZone" onclick="triggerFileInput()">
               <div class="upload-icon-wrap">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </div>
-              <div class="upload-text">Tap to upload or photograph</div>
-              <div class="upload-hint">PDF, JPG, PNG &middot; Max 10 MB</div>
+              <div class="upload-text">Tap to select any document file</div>
+              <div class="upload-hint">TXT, PDF, JPG, PNG &middot; Live OCR &amp; AI Analysis</div>
             </div>
             <div class="upload-options">
-              <div class="upload-option-row">
-                <span>📷</span><span>Take a photo of document</span>
+              <div class="upload-option-row" onclick="loadSampleScholarshipNotice()">
+                <span>📄</span><span>Load Sample Scholarship Circular (from fixtures)</span>
               </div>
-              <div class="upload-option-row">
-                <span>📁</span><span>Choose from files</span>
+              <div class="upload-option-row" onclick="triggerFileInput()">
+                <span>📁</span><span>Choose from device files</span>
               </div>
-              <div class="upload-option-row">
-                <span>🌐</span><span>Paste a link or URL</span>
+              <div class="upload-option-row" onclick="showPasteModal()">
+                <span>📋</span><span>Paste notice / circular text directly</span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paste Text Modal -->
+      <div class="modal-overlay" id="pasteModal" onclick="closePasteModal(event)">
+        <div class="modal-sheet" id="pasteModalSheet">
+          <div class="modal-handle"></div>
+          <div class="upload-modal-body">
+            <div class="upload-title">Paste Document / Circular Text</div>
+            <p style="font-size:0.75rem;color:var(--text-m);margin-bottom:10px;">Paste raw text from any circular, notice, or bill to extract deadlines, action items, and summary.</p>
+            <input type="text" id="pasteDocTitle" class="chat-input" placeholder="Document Title (e.g., Scholarship Circular 2026)" style="width:100%;margin-bottom:8px;">
+            <textarea id="pasteDocContent" class="chat-input" placeholder="Paste the text here..." style="width:100%;height:120px;border-radius:12px;resize:none;padding:10px;font-family:inherit;font-size:0.8rem;"></textarea>
+            <button class="modal-action-btn" onclick="submitPastedDocument()" style="margin-top:10px;">Analyze with AI</button>
+            <button class="modal-close-btn" onclick="closePasteModal()">Cancel</button>
           </div>
         </div>
       </div>

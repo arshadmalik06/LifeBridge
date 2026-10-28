@@ -839,6 +839,42 @@ body {
 }
 .chat-input::placeholder { color: var(--text-d); }
 .chat-input:focus { border-color: #0f172a; }
+.chat-mic-btn {
+  width: 36px; height: 36px;
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #475569;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.chat-mic-btn:hover { background: #e2e8f0; color: #0f172a; }
+.chat-mic-btn.recording {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+  animation: pulseRec 1.2s infinite;
+}
+@keyframes pulseRec {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); box-shadow: 0 0 10px rgba(220, 38, 38, 0.3); }
+}
+
+.chat-speech-speak-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-left: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.chat-speech-speak-btn:hover { color: #0f172a; }
+
 .chat-send-btn {
   width: 36px; height: 36px;
   background: #0f172a;
@@ -1256,8 +1292,8 @@ body {
   gap: 3px;
   background: none;
   border: none;
-  color: #94a3b8;
-  font-size: 0.65rem;
+  color: #8a94a6;
+  font-size: 0.7rem;
   font-weight: 600;
   font-family: var(--font);
   cursor: pointer;
@@ -1272,22 +1308,29 @@ body {
   width: 4px; height: 4px;
   border-radius: 50%;
   background: transparent;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 .nav-item.active .nav-dot { background: #0f172a; }
 
-/* Task badge on nav */
+/* Task badge on nav matching screenshot */
 .nav-badge {
   position: absolute;
-  top: 0; right: 50%;
-  transform: translateX(14px);
+  top: -2px;
+  right: 50%;
+  transform: translateX(12px);
   background: #dc2626;
   color: #ffffff;
-  font-size: 0.58rem;
+  font-size: 0.65rem;
   font-weight: 800;
-  padding: 1px 5px;
-  border-radius: var(--r-f);
-  line-height: 1.4;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+  padding: 0 3px;
+  line-height: 1;
 }
 
 /* ========================

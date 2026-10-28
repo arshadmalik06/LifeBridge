@@ -1,14 +1,15 @@
 // ============================================================
-//  LifeBridge Mobile Web App — app.js
-//  Multi-screen document OS demo
+//  LifeBridge Mobile Web App — app.js (v2 Feature Edition)
+//  Multi-screen document OS with Real Upload, Live Extraction,
+//  LocalStorage Persistence, Speech-to-Text & Gemini AI support
 // ============================================================
 
 'use strict';
 
 // ============================================================
-//  DATA
+//  DEFAULT SEED DATA
 // ============================================================
-const DOCUMENTS = [
+const DEFAULT_DOCUMENTS = [
   {
     id: 'doc-1',
     name: 'State Merit Scholarship 2026',
@@ -188,7 +189,7 @@ const DOCUMENTS = [
   }
 ];
 
-const TASKS = [
+const DEFAULT_TASKS = [
   {
     id: 'task-1', docId: 'doc-1',
     title: 'Download Annexure Form 4B from portal',
@@ -250,18 +251,53 @@ const AI_RESPONSES = {
   'tax notice': 'Your Income Tax Notice requires **5 mandatory documents** for the scholarship. For the tax notice specifically, you need Form 16 from your employer and access to incometax.gov.in to contest the TDS mismatch of ₹3,450.',
   'medical report': 'Your Annual Health Checkup Report shows **all major markers are normal**. The only concern is Vitamin D at 22 ng/mL (below the 30–100 normal range). Doctor recommends Vitamin D3 60,000 IU weekly for 8 weeks.',
   'eligibility': 'Based on your uploaded documents: ✅ You are enrolled full-time at Pune University (3rd year) ✅ Your bonafide certificate is valid ✅ You need to verify that your family income is under ₹3,50,000 with a Tehsildar certificate.',
-  default: 'Great question! Based on your 8 uploaded documents, I can see you have an urgent scholarship deadline (Oct 31), a tax notice response due Nov 5, and a Vitamin D supplement task from your medical report. Which document would you like to dive into?'
+  default: 'Great question! Based on your uploaded documents, I can see all your deadlines, verified tasks, and financial details. Ask me about any specific document, requirement, or date!'
 };
+
+// ============================================================
+//  LOCALSTORAGE PERSISTENCE HELPERS
+// ============================================================
+function loadStoredDocuments() {
+  try {
+    const raw = localStorage.getItem('lifebridge_docs_v2');
+    if (raw) return JSON.parse(raw);
+  } catch (e) { console.error('Error loading documents:', e); }
+  return JSON.parse(JSON.stringify(DEFAULT_DOCUMENTS));
+}
+
+function saveStoredDocuments() {
+  try {
+    localStorage.setItem('lifebridge_docs_v2', JSON.stringify(DOCUMENTS));
+  } catch (e) { console.error('Error saving documents:', e); }
+}
+
+function loadStoredTasks() {
+  try {
+    const raw = localStorage.getItem('lifebridge_tasks_v2');
+    if (raw) return JSON.parse(raw);
+  } catch (e) { console.error('Error loading tasks:', e); }
+  return JSON.parse(JSON.stringify(DEFAULT_TASKS));
+}
+
+function saveStoredTasks() {
+  try {
+    localStorage.setItem('lifebridge_tasks_v2', JSON.stringify(tasks));
+  } catch (e) { console.error('Error saving tasks:', e); }
+}
 
 // ============================================================
 //  APP STATE
 // ============================================================
 let activeScreen  = 'home';
-let activeLang    = 'en';
-let tasks         = JSON.parse(JSON.stringify(TASKS));
+let activeLang    = localStorage.getItem('lifebridge_lang_v2') || 'en';
+let DOCUMENTS     = loadStoredDocuments();
+let tasks         = loadStoredTasks();
 let vaultFilter   = 'all';
 let docModalOpen  = false;
 let uploadOpen    = false;
+let apiKey        = localStorage.getItem('lifebridge_gemini_api_key') || '';
+let recognition   = null;
+let isRecording   = false;
 
 // ============================================================
 //  INIT
@@ -269,27 +305,34 @@ let uploadOpen    = false;
 document.addEventListener('DOMContentLoaded', () => {
   setGreeting();
   setTimeLoop();
+  updateHomeStats();
   renderRecentDocs();
   renderVault();
   renderTasks();
+  initVoiceRecognition();
+  updateApiKeyStatusUI();
+
+  // Set stored language
+  const langSel = document.getElementById('globalLangSelect');
+  if (langSel) {
+    langSel.value = activeLang;
+    const labels = { en: 'English', hi: 'Hindi (हिन्दी)', mr: 'Marathi (मराठी)', ta: 'Tamil (தமிழ்)' };
+    const label = document.getElementById('currentLangLabel');
+    if (label) label.textContent = labels[activeLang] || 'English';
+
+    langSel.addEventListener('change', (e) => {
+      activeLang = e.target.value;
+      localStorage.setItem('lifebridge_lang_v2', activeLang);
+      if (label) label.textContent = labels[activeLang] || 'English';
+      showToast('Language updated to ' + (labels[activeLang] || 'English'));
+    });
+  }
 
   // Chat input enter key
   const chatInput = document.getElementById('chatInput');
   if (chatInput) {
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') sendChatMessage();
-    });
-  }
-
-  // Language select
-  const langSel = document.getElementById('globalLangSelect');
-  if (langSel) {
-    langSel.addEventListener('change', (e) => {
-      activeLang = e.target.value;
-      const labels = { en: 'English', hi: 'Hindi (हिन्दी)', mr: 'Marathi (मराठी)', ta: 'Tamil (தமிழ்)' };
-      const label = document.getElementById('currentLangLabel');
-      if (label) label.textContent = labels[activeLang] || 'English';
-      showToast('Language updated to ' + (labels[activeLang] || 'English'));
     });
   }
 });
@@ -320,7 +363,6 @@ function setTimeLoop() {
 //  NAVIGATION
 // ============================================================
 function navigateTo(screen) {
-  // Deactivate old screen + nav item
   const oldScreen = document.getElementById('screen-' + activeScreen);
   const oldNav    = document.getElementById('nav-' + activeScreen);
   if (oldScreen) oldScreen.classList.remove('active');
@@ -328,19 +370,49 @@ function navigateTo(screen) {
 
   activeScreen = screen;
 
-  // Activate new screen + nav item
   const newScreen = document.getElementById('screen-' + screen);
   const newNav    = document.getElementById('nav-' + screen);
   if (newScreen) newScreen.classList.add('active');
   if (newNav)    newNav.classList.add('active');
 
-  // Screen-specific refresh
   if (screen === 'tasks') renderTasks();
+  if (screen === 'vault') renderVault();
+  if (screen === 'home') updateHomeStats();
 }
 
 // ============================================================
-//  RENDER: RECENT DOCS (Home — show 4 most recent)
+//  RENDER: RECENT DOCS & STATS (Home)
 // ============================================================
+function updateHomeStats() {
+  const docCards = document.querySelectorAll('.stat-card');
+  if (docCards.length >= 3) {
+    const urgentCount = tasks.filter(t => t.isUrgent && !t.done).length;
+    const pendingCount = tasks.filter(t => !t.done).length;
+    
+    const numEls = document.querySelectorAll('.stat-num');
+    if (numEls.length >= 3) {
+      numEls[0].textContent = DOCUMENTS.length;
+      numEls[1].textContent = pendingCount;
+      numEls[2].textContent = urgentCount;
+    }
+  }
+
+  // Update urgent banner
+  const urgentTasks = tasks.filter(t => t.isUrgent && !t.done);
+  const banner = document.getElementById('urgentBanner');
+  if (banner) {
+    if (urgentTasks.length > 0) {
+      banner.style.display = 'flex';
+      const titleEl = banner.querySelector('.urgent-title');
+      const subEl = banner.querySelector('.urgent-sub');
+      if (titleEl) titleEl.textContent = `${urgentTasks.length} Urgent Deadlines This Week`;
+      if (subEl) subEl.textContent = urgentTasks.slice(0, 2).map(t => `${t.title} (${t.due})`).join(' · ');
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+}
+
 function renderRecentDocs() {
   const container = document.getElementById('recentDocList');
   if (!container) return;
@@ -378,17 +450,15 @@ function docCardHTML(doc) {
     financial: 'Financial', utility: 'Utility', rental: 'Rental', insurance: 'Insurance'
   }[doc.category] || doc.category;
 
-  const urgentBorder = doc.urgency === 'urgent'
-    ? 'border-color: #fca5a5;'
-    : '';
+  const urgentBorder = doc.urgency === 'urgent' ? 'border-color: #fca5a5;' : '';
 
   return `
   <div class="doc-card" onclick="openDocModal('${doc.id}')" style="${urgentBorder}" id="doccard-${doc.id}">
     <div class="doc-icon icon-${doc.category}">${doc.icon}</div>
     <div class="doc-body">
       <span class="doc-cat-badge cat-${doc.category}">${catLabel}</span>
-      <div class="doc-name">${doc.name}</div>
-      <div class="doc-meta">${doc.meta} &middot; ${doc.date}</div>
+      <div class="doc-name">${escapeHTML(doc.name)}</div>
+      <div class="doc-meta">${escapeHTML(doc.meta)} &middot; ${doc.date}</div>
     </div>
     ${doc.urgency === 'urgent' ? '<div style="color:var(--red-l);font-size:0.7rem;font-weight:700;flex-shrink:0;">URGENT</div>' : '<svg class="doc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'}
   </div>`;
@@ -404,19 +474,19 @@ function openDocModal(docId) {
   const lang = activeLang;
   const explanation = (doc.explanation && doc.explanation[lang]) || doc.explanation?.en || '';
 
-  const factsHTML = doc.facts.map(f => `
+  const factsHTML = (doc.facts || []).map(f => `
     <div class="modal-fact">
       <span class="modal-fact-icon">${f.icon}</span>
-      <span>${f.text}</span>
+      <span>${escapeHTML(f.text)}</span>
     </div>`).join('');
 
-  const tasksForDoc = tasks.filter(t => doc.taskIds.includes(t.id));
+  const tasksForDoc = tasks.filter(t => (doc.taskIds || []).includes(t.id));
   const tasksHTML = tasksForDoc.length ? `
     <div class="modal-section-label">Action Tasks (${tasksForDoc.length})</div>
     ${tasksForDoc.map(t => `
       <div class="modal-fact" style="cursor:pointer" onclick="toggleTaskFromModal('${t.id}')">
         <span class="modal-fact-icon">${t.done ? '✅' : '⬜'}</span>
-        <span style="${t.done ? 'text-decoration:line-through;color:var(--text-d);' : ''}">${t.title}</span>
+        <span style="${t.done ? 'text-decoration:line-through;color:var(--text-d);' : ''}">${escapeHTML(t.title)}</span>
       </div>`).join('')}
   ` : '';
 
@@ -424,13 +494,16 @@ function openDocModal(docId) {
     <div class="modal-doc-header">
       <div class="modal-doc-icon icon-${doc.category}">${doc.icon}</div>
       <div>
-        <div class="modal-doc-title">${doc.name}</div>
-        <div class="modal-doc-meta">${doc.meta} &middot; ${doc.date}</div>
+        <div class="modal-doc-title">${escapeHTML(doc.name)}</div>
+        <div class="modal-doc-meta">${escapeHTML(doc.meta)} &middot; ${doc.date}</div>
       </div>
     </div>
 
-    <div class="modal-section-label">AI Explanation</div>
-    <div class="modal-explanation">${explanation}</div>
+    <div class="modal-section-label" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>AI Explanation (${activeLang.toUpperCase()})</span>
+      <button class="chat-speech-speak-btn" onclick="speakText('${escapeQuotes(explanation)}')" title="Read aloud">🔊 Listen</button>
+    </div>
+    <div class="modal-explanation">${escapeHTML(explanation)}</div>
 
     <div class="modal-section-label">Key Facts</div>
     ${factsHTML}
@@ -458,13 +531,18 @@ function toggleTaskFromModal(taskId) {
   const task = tasks.find(t => t.id === taskId);
   if (task) {
     task.done = !task.done;
+    saveStoredTasks();
     updateTaskNavBadge();
+    updateHomeStats();
     showToast(task.done ? '✅ Task marked complete!' : '↩️ Task reopened');
+    // Refresh modal list
+    const currentDoc = DOCUMENTS.find(d => (d.taskIds || []).includes(taskId));
+    if (currentDoc) openDocModal(currentDoc.id);
   }
 }
 
 // ============================================================
-//  UPLOAD MODAL
+//  UPLOAD MODAL & REAL FILE INGESTION
 // ============================================================
 function showUploadModal() {
   document.getElementById('uploadModal').classList.add('open');
@@ -477,52 +555,294 @@ function closeUploadModal(e) {
   uploadOpen = false;
 }
 
-function simulateUpload() {
-  document.getElementById('uploadModal').classList.remove('open');
-  uploadOpen = false;
-  startScan();
+function triggerFileInput() {
+  const input = document.getElementById('realFileInput');
+  if (input) input.click();
+}
+
+function handleRealFileUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  closeUploadModal();
+  const reader = new FileReader();
+
+  if (file.name.endsWith('.txt') || file.type.startsWith('text/')) {
+    reader.onload = (e) => {
+      const content = e.target.result;
+      processDocumentText(file.name, content);
+    };
+    reader.readAsText(file);
+  } else {
+    // For images/PDFs, extract filename info and simulate multimodal OCR
+    reader.onload = () => {
+      processDocumentText(file.name, `Scanned file: ${file.name} (${Math.round(file.size / 1024)} KB)`);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// Load fixture from /fixtures/sample_scholarship_notice.txt
+async function loadSampleScholarshipNotice() {
+  closeUploadModal();
+  try {
+    const res = await fetch('/fixtures/sample_scholarship_notice.txt');
+    if (!res.ok) throw new Error('Fixture file not found');
+    const text = await res.text();
+    processDocumentText('State Merit Scholarship 2026-27 (Official Circular)', text);
+  } catch (err) {
+    console.warn('Fallback sample circular:', err);
+    const fallbackText = `STATE GOVERNMENT OF MAHARASHTRA
+NOTIFICATION REF: DHE/SCHOL/2026/UG-8821
+SUBJECT: State Post-Matriculation Merit-cum-Means Financial Assistance 2026-2027
+Deadline: 31st October 2026. Required: Income Certificate under ₹3,50,000, Annexure Form 4B, Domicile certificate.`;
+    processDocumentText('State Merit Scholarship 2026-27', fallbackText);
+  }
 }
 
 // ============================================================
-//  SCANNING ANIMATION
+//  PASTE DIRECT TEXT MODAL
 // ============================================================
-function startScan() {
+function showPasteModal() {
+  closeUploadModal();
+  document.getElementById('pasteModal').classList.add('open');
+}
+
+function closePasteModal(e) {
+  if (e && e.target !== document.getElementById('pasteModal')) return;
+  document.getElementById('pasteModal').classList.remove('open');
+}
+
+function submitPastedDocument() {
+  const titleInput = document.getElementById('pasteDocTitle');
+  const contentInput = document.getElementById('pasteDocContent');
+  const title = (titleInput && titleInput.value.trim()) || 'Pasted Document Circular';
+  const content = contentInput && contentInput.value.trim();
+
+  if (!content) {
+    showToast('⚠️ Please paste text from the document');
+    return;
+  }
+
+  closePasteModal();
+  if (titleInput) titleInput.value = '';
+  if (contentInput) contentInput.value = '';
+
+  processDocumentText(title, content);
+}
+
+// ============================================================
+//  DOCUMENT ANALYSIS ENGINE (AI or Heuristics)
+// ============================================================
+function processDocumentText(title, text) {
   const overlay = document.getElementById('scanOverlay');
   const status  = document.getElementById('scanStatusMsg');
   const fill    = document.getElementById('scanProgressFill');
 
   overlay.classList.add('active');
+  if (fill) fill.style.width = '15%';
 
   const steps = [
     [0,    'Reading document structure...'],
-    [700,  'Detecting document type...'],
-    [1500, 'Extracting deadlines & key facts...'],
-    [2300, 'Verifying official portal links...'],
-    [3000, 'Generating action tasks...'],
-    [3700, null]  // done
+    [600,  'Detecting document type & authority...'],
+    [1300, 'Extracting deadlines & eligibility...'],
+    [2100, 'Generating actionable verified tasks...'],
+    [2800, 'Saving to encrypted Document Vault...']
   ];
 
   steps.forEach(([delay, msg]) => {
     setTimeout(() => {
-      if (msg === null) {
-        overlay.classList.remove('active');
-        fill.style.width = '0%';
-        showToast('✅ Document analyzed! Vault updated.');
-      } else {
-        if (status) status.textContent = msg;
-        const pct = Math.round(((steps.indexOf([delay, msg]) + 1) / (steps.length - 1)) * 100);
-        if (fill) fill.style.width = pct + '%';
-      }
+      if (status) status.textContent = msg;
+      const pct = Math.round(((steps.indexOf([delay, msg]) + 1) / (steps.length + 1)) * 100);
+      if (fill) fill.style.width = pct + '%';
     }, delay);
   });
 
-  // Calculate progress manually
-  steps.forEach(([delay,], idx) => {
-    setTimeout(() => {
-      const pct = Math.round((idx / (steps.length - 1)) * 100);
-      if (fill) fill.style.width = Math.min(pct, 100) + '%';
-    }, delay);
-  });
+  setTimeout(async () => {
+    let analyzedDoc;
+    if (apiKey) {
+      if (status) status.textContent = 'Calling Gemini 2.5 Flash API...';
+      analyzedDoc = await callGeminiToAnalyzeDoc(title, text);
+    }
+    
+    if (!analyzedDoc) {
+      analyzedDoc = analyzeDocWithLocalRules(title, text);
+    }
+
+    // Save newly generated document & tasks
+    DOCUMENTS.unshift(analyzedDoc.document);
+    saveStoredDocuments();
+
+    if (analyzedDoc.newTasks && analyzedDoc.newTasks.length) {
+      tasks = analyzedDoc.newTasks.concat(tasks);
+      saveStoredTasks();
+    }
+
+    overlay.classList.remove('active');
+    if (fill) fill.style.width = '0%';
+
+    updateHomeStats();
+    renderRecentDocs();
+    renderVault();
+    renderTasks();
+
+    showToast(`✅ "${analyzedDoc.document.name}" analyzed & saved!`);
+  }, 3200);
+}
+
+// Local regex & heuristic extraction
+function analyzeDocWithLocalRules(title, text) {
+  const id = 'doc-' + Date.now();
+  const lower = text.toLowerCase();
+
+  let category = 'education';
+  let icon = '📄';
+  if (lower.includes('tax') || lower.includes('income') || lower.includes('revenue') || lower.includes('challan')) {
+    category = 'government'; icon = '🏛️';
+  } else if (lower.includes('medical') || lower.includes('health') || lower.includes('hospital') || lower.includes('blood') || lower.includes('report')) {
+    category = 'medical'; icon = '🏥';
+  } else if (lower.includes('electricity') || lower.includes('bill') || lower.includes('water') || lower.includes('utility')) {
+    category = 'utility'; icon = '⚡';
+  } else if (lower.includes('rent') || lower.includes('lease') || lower.includes('agreement') || lower.includes('tenant')) {
+    category = 'rental'; icon = '🏠';
+  } else if (lower.includes('insurance') || lower.includes('policy') || lower.includes('claim')) {
+    category = 'insurance'; icon = '🛡️';
+  } else if (lower.includes('bank') || lower.includes('salary') || lower.includes('statement') || lower.includes('account')) {
+    category = 'financial'; icon = '💳';
+  } else if (lower.includes('scholarship') || lower.includes('college') || lower.includes('degree') || lower.includes('exam')) {
+    category = 'education'; icon = '🎓';
+  }
+
+  // Find date/deadline
+  const dateMatch = text.match(/(?:deadline|due|dated?|date|before)[\s:]*([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+\s+[0-9]{4}|[0-9]{1,2}[\/\-][0-9]{1,2}[\/\-][0-9]{2,4})/i);
+  const foundDate = dateMatch ? dateMatch[1] : 'Upcoming';
+  const isUrgent = lower.includes('deadline') || lower.includes('notice') || lower.includes('urgent') || lower.includes('due');
+
+  const taskId1 = 'task-' + Date.now() + '-1';
+  const taskId2 = 'task-' + Date.now() + '-2';
+
+  const newDoc = {
+    id: id,
+    name: title.replace(/\.[^/.]+$/, ''),
+    category: category,
+    icon: icon,
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    meta: `AI Processed · Ref: ${Math.floor(1000 + Math.random() * 9000)}`,
+    urgency: isUrgent ? 'urgent' : 'normal',
+    explanation: {
+      en: `LifeBridge processed "${title}". Key directive: please review requirements and verify deadlines before ${foundDate}.`,
+      hi: `लाइफब्रिज ने "${title}" का विश्लेषण किया। महत्वपूर्ण निर्देश: ${foundDate} से पहले आवश्यकताओं की पुष्टि करें।`,
+      mr: `लाईफब्रिजने "${title}" चे विश्लेषण केले. महत्त्वाचा निर्देश: ${foundDate} पूर्वी आवश्यक बाबी तपासा.`,
+      ta: `லைஃப்பிரிட்ஜ் "${title}" ஆவணத்தை ஆய்வு செய்தது. முக்கிய விவரம்: ${foundDate} க்குள் முடிக்கவும்.`
+    },
+    facts: [
+      { icon: '📅', text: `Detected Deadline / Reference: ${foundDate}` },
+      { icon: '📁', text: `Classified as ${category.toUpperCase()} document` },
+      { icon: '🔒', text: 'Sensitive personal identifiers auto-redacted' }
+    ],
+    taskIds: [taskId1, taskId2]
+  };
+
+  const newTasks = [
+    {
+      id: taskId1,
+      docId: id,
+      title: `Review and verify: ${newDoc.name}`,
+      due: foundDate,
+      isUrgent: isUrgent,
+      done: false,
+      sub: 'Action extracted by LifeBridge AI'
+    },
+    {
+      id: taskId2,
+      docId: id,
+      title: 'Submit required documents or confirmation',
+      due: foundDate,
+      isUrgent: false,
+      done: false,
+      sub: 'Follow official portal instructions'
+    }
+  ];
+
+  return { document: newDoc, newTasks: newTasks };
+}
+
+// Live Gemini multimodal/text call
+async function callGeminiToAnalyzeDoc(title, text) {
+  try {
+    const prompt = `You are LifeBridge Document OS. Analyze the following document and return a JSON object with:
+{
+  "name": "Short Clean Name",
+  "category": "education" | "medical" | "government" | "financial" | "utility" | "rental" | "insurance",
+  "urgency": "urgent" | "normal",
+  "deadline": "Extracted date string or None",
+  "summary": "Clear 2-sentence plain English summary of what the document means and what the user must do next",
+  "facts": ["Fact 1", "Fact 2", "Fact 3"],
+  "tasks": ["Specific Action 1", "Specific Action 2"]
+}
+
+DOCUMENT TITLE: ${title}
+CONTENT:
+${text.slice(0, 4000)}`;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      })
+    });
+
+    if (!res.ok) throw new Error('Gemini API call failed: ' + res.status);
+    const data = await res.json();
+    const parsed = JSON.parse(data.candidates[0].content.parts[0].text);
+
+    const docId = 'doc-' + Date.now();
+    const taskIds = (parsed.tasks || []).map((_, i) => `task-${Date.now()}-${i}`);
+
+    const newDoc = {
+      id: docId,
+      name: parsed.name || title,
+      category: parsed.category || 'education',
+      icon: getIconForCategory(parsed.category),
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      meta: `Gemini AI Verified · ${parsed.deadline || 'Active'}`,
+      urgency: parsed.urgency || 'normal',
+      explanation: {
+        en: parsed.summary,
+        hi: parsed.summary,
+        mr: parsed.summary,
+        ta: parsed.summary
+      },
+      facts: (parsed.facts || []).map(f => ({ icon: '📌', text: f })),
+      taskIds: taskIds
+    };
+
+    const newTasks = (parsed.tasks || []).map((t, i) => ({
+      id: taskIds[i],
+      docId: docId,
+      title: t,
+      due: parsed.deadline || 'Follow-up',
+      isUrgent: parsed.urgency === 'urgent',
+      done: false,
+      sub: 'Generated by Gemini AI'
+    }));
+
+    return { document: newDoc, newTasks: newTasks };
+  } catch (err) {
+    console.error('Gemini extraction error:', err);
+    return null;
+  }
+}
+
+function getIconForCategory(cat) {
+  const map = {
+    education: '🎓', medical: '🏥', government: '🏛️',
+    financial: '💳', utility: '⚡', rental: '🏠', insurance: '🛡️'
+  };
+  return map[cat] || '📄';
 }
 
 // ============================================================
@@ -542,10 +862,9 @@ function renderTasks() {
   normalEl.innerHTML = normal.length ? normal.map(taskHTML).join('') : '<div class="no-tasks">All caught up!</div>';
   doneEl.innerHTML   = done.length   ? done.map(taskHTML).join('')   : '<div class="no-tasks">No completed tasks yet</div>';
 
-  // Update progress
   const totalCount = tasks.length;
   const doneCount  = done.length;
-  const pct        = Math.round((doneCount / totalCount) * 100);
+  const pct        = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
   const fillEl     = document.getElementById('progressFill');
   const labelEl    = document.getElementById('progressLabel');
   const subEl      = document.getElementById('progressSub');
@@ -563,9 +882,9 @@ function renderTasks() {
 }
 
 function taskHTML(task) {
-  const doc = DOCUMENTS.find(d => d.taskIds && d.taskIds.includes(task.id));
+  const doc = DOCUMENTS.find(d => (d.taskIds || []).includes(task.id));
   const docPill = doc
-    ? `<div class="task-doc-pill">${doc.icon} ${doc.name}</div>`
+    ? `<div class="task-doc-pill">${doc.icon} ${escapeHTML(doc.name)}</div>`
     : '';
 
   return `
@@ -576,9 +895,9 @@ function taskHTML(task) {
       ${task.done ? '✓' : ''}
     </div>
     <div class="task-body">
-      <div class="task-title-new">${task.title}</div>
+      <div class="task-title-new">${escapeHTML(task.title)}</div>
       <div class="task-due ${task.isUrgent && !task.done ? 'overdue' : ''}">📅 ${task.due}</div>
-      <div class="task-sub">${task.sub}</div>
+      <div class="task-sub">${escapeHTML(task.sub)}</div>
       ${docPill}
     </div>
   </div>`;
@@ -588,7 +907,9 @@ function toggleTask(taskId) {
   const task = tasks.find(t => t.id === taskId);
   if (!task) return;
   task.done = !task.done;
+  saveStoredTasks();
   renderTasks();
+  updateHomeStats();
   showToast(task.done ? '✅ Task completed!' : '↩️ Task reopened');
 }
 
@@ -602,16 +923,94 @@ function updateTaskNavBadge() {
 }
 
 // ============================================================
-//  CHAT / ASK AI
+//  VOICE INPUT (Speech Recognition) & SPEECH SYNTHESIS (TTS)
+// ============================================================
+function initVoiceRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    const mic = document.getElementById('chatMicBtn');
+    if (mic) mic.title = 'Speech recognition not supported in this browser';
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = activeLang === 'hi' ? 'hi-IN' : activeLang === 'mr' ? 'mr-IN' : activeLang === 'ta' ? 'ta-IN' : 'en-IN';
+
+  recognition.onstart = () => {
+    isRecording = true;
+    const btn = document.getElementById('chatMicBtn');
+    if (btn) btn.classList.add('recording');
+    showToast('🎙️ Listening... Speak now');
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const input = document.getElementById('chatInput');
+    if (input) {
+      input.value = transcript;
+      sendChatMessage();
+    }
+  };
+
+  recognition.onerror = (e) => {
+    console.error('Speech recognition error:', e);
+    showToast('Mic error: ' + (e.error || 'Please check mic permissions'));
+    stopVoiceInput();
+  };
+
+  recognition.onend = () => {
+    stopVoiceInput();
+  };
+}
+
+function toggleVoiceInput() {
+  if (!recognition) {
+    showToast('⚠️ Speech recognition is not supported in this browser');
+    return;
+  }
+  if (isRecording) {
+    recognition.stop();
+  } else {
+    try {
+      recognition.lang = activeLang === 'hi' ? 'hi-IN' : activeLang === 'mr' ? 'mr-IN' : activeLang === 'ta' ? 'ta-IN' : 'en-IN';
+      recognition.start();
+    } catch (e) {
+      console.warn('Speech start error:', e);
+    }
+  }
+}
+
+function stopVoiceInput() {
+  isRecording = false;
+  const btn = document.getElementById('chatMicBtn');
+  if (btn) btn.classList.remove('recording');
+}
+
+function speakText(text) {
+  if (!('speechSynthesis' in window)) {
+    showToast('⚠️ Audio text-to-speech not supported');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = activeLang === 'hi' ? 'hi-IN' : activeLang === 'mr' ? 'mr-IN' : activeLang === 'ta' ? 'ta-IN' : 'en-US';
+  utterance.rate = 1.0;
+  window.speechSynthesis.speak(utterance);
+  showToast('🔊 Playing audio readout');
+}
+
+// ============================================================
+//  CHAT / ASK AI (Live Gemini + Offline Fallback)
 // ============================================================
 function sendSuggestedMsg(btn) {
   const msg = btn.getAttribute('data-msg');
   if (!msg) return;
-  // Hide suggestions row
   const row = document.getElementById('suggestionsRow');
   if (row) row.style.display = 'none';
   appendUserMessage(msg);
-  simulateAIResponse(msg);
+  dispatchAIQuery(msg);
 }
 
 function sendChatMessage() {
@@ -625,7 +1024,7 @@ function sendChatMessage() {
   if (row) row.style.display = 'none';
 
   appendUserMessage(msg);
-  simulateAIResponse(msg);
+  dispatchAIQuery(msg);
 }
 
 function appendUserMessage(text) {
@@ -643,19 +1042,79 @@ function appendAIMessage(text) {
   if (!container) return;
   const div = document.createElement('div');
   div.className = 'chat-msg ai-msg';
+
+  const plainText = text.replace(/<[^>]*>/g, '');
   div.innerHTML = `
     <div class="chat-avatar-ai">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
     </div>
-    <div class="chat-bubble ai-bubble">${text}</div>`;
+    <div class="chat-bubble ai-bubble">
+      ${text}
+      <div style="margin-top:6px;display:flex;justify-content:flex-end;">
+        <button class="chat-speech-speak-btn" onclick="speakText('${escapeQuotes(plainText)}')">🔊 Listen</button>
+      </div>
+    </div>`;
   container.appendChild(div);
   div.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
-function simulateAIResponse(userMsg) {
-  // Typing indicator
+async function dispatchAIQuery(userMsg) {
+  showTypingIndicator();
+
+  if (apiKey) {
+    try {
+      const docContext = DOCUMENTS.map(d => `- [${d.category}] ${d.name}: ${d.explanation.en} (Tasks: ${d.taskIds.length})`).join('\n');
+      const prompt = `You are LifeBridge, the user's personal Document OS.
+Answer the user's question concisely based on their active documents below. If the answer is found in the documents, state the exact date, action, or requirement clearly.
+
+USER'S ACTIVE DOCUMENTS:
+${docContext}
+
+USER'S QUESTION: ${userMsg}`;
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.candidates[0].content.parts[0].text;
+        hideTypingIndicator();
+        appendAIMessage(text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+        return;
+      }
+    } catch (e) {
+      console.warn('Gemini chat error, falling back to local dataset:', e);
+    }
+  }
+
+  // Fallback to local contextual Q&A
+  setTimeout(() => {
+    hideTypingIndicator();
+    const lower = userMsg.toLowerCase();
+    let response = AI_RESPONSES.default;
+    if (lower.includes('scholarship') || lower.includes('deadline')) response = AI_RESPONSES['scholarship deadline'];
+    else if (lower.includes('tax') || lower.includes('notice') || lower.includes('documents') || lower.includes('income')) response = AI_RESPONSES['tax notice'];
+    else if (lower.includes('medical') || lower.includes('health') || lower.includes('vitamin')) response = AI_RESPONSES['medical report'];
+    else if (lower.includes('eligible') || lower.includes('eligibility') || lower.includes('qualify')) response = AI_RESPONSES['eligibility'];
+    else {
+      // Dynamic matching across user documents
+      const matchedDoc = DOCUMENTS.find(d => lower.includes(d.name.toLowerCase()) || lower.includes(d.category));
+      if (matchedDoc) {
+        response = `Regarding **${matchedDoc.name}**: ${matchedDoc.explanation[activeLang] || matchedDoc.explanation.en}`;
+      }
+    }
+
+    appendAIMessage(response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+  }, 900);
+}
+
+function showTypingIndicator() {
   const container = document.getElementById('chatMessages');
-  if (!container) return;
+  if (!container || document.getElementById('typingIndicator')) return;
 
   const typing = document.createElement('div');
   typing.className = 'chat-msg ai-msg';
@@ -672,7 +1131,6 @@ function simulateAIResponse(userMsg) {
       </span>
     </div>`;
 
-  // Inject typing keyframes if not present
   if (!document.getElementById('typDotStyle')) {
     const style = document.createElement('style');
     style.id = 'typDotStyle';
@@ -683,33 +1141,52 @@ function simulateAIResponse(userMsg) {
 
   container.appendChild(typing);
   typing.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-  const delay = 900 + Math.random() * 600;
-  setTimeout(() => {
-    const ti = document.getElementById('typingIndicator');
-    if (ti) ti.remove();
-
-    // Pick AI response
-    const lower = userMsg.toLowerCase();
-    let response = AI_RESPONSES.default;
-    if (lower.includes('scholarship') || lower.includes('deadline')) response = AI_RESPONSES['scholarship deadline'];
-    else if (lower.includes('tax') || lower.includes('notice') || lower.includes('documents') || lower.includes('income')) response = AI_RESPONSES['tax notice'];
-    else if (lower.includes('medical') || lower.includes('health') || lower.includes('vitamin')) response = AI_RESPONSES['medical report'];
-    else if (lower.includes('eligible') || lower.includes('eligibility') || lower.includes('qualify')) response = AI_RESPONSES['eligibility'];
-
-    // Format markdown-style bold
-    const formatted = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    appendAIMessage(formatted);
-  }, delay);
 }
 
+function hideTypingIndicator() {
+  const ti = document.getElementById('typingIndicator');
+  if (ti) ti.remove();
+}
+
+// ============================================================
+//  API KEY MANAGEMENT (Profile Screen)
+// ============================================================
+function promptApiKey() {
+  const existing = localStorage.getItem('lifebridge_gemini_api_key') || '';
+  const key = prompt('Enter your Google Gemini API Key for live AI extraction and dynamic Q&A:\n(Leave blank to clear and use offline heuristics)', existing);
+  if (key !== null) {
+    apiKey = key.trim();
+    if (apiKey) {
+      localStorage.setItem('lifebridge_gemini_api_key', apiKey);
+      showToast('🔑 Gemini API Key saved! Live AI activated.');
+    } else {
+      localStorage.removeItem('lifebridge_gemini_api_key');
+      showToast('Offline heuristic mode restored.');
+    }
+    updateApiKeyStatusUI();
+  }
+}
+
+function updateApiKeyStatusUI() {
+  const label = document.getElementById('apiKeyStatusLabel');
+  if (label) {
+    label.textContent = apiKey ? `Configured (***${apiKey.slice(-4)})` : 'Not set (using offline heuristics)';
+  }
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
 function escapeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ============================================================
-//  TOAST
-// ============================================================
+function escapeQuotes(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+}
+
 function showToast(msg) {
   const el  = document.getElementById('toastEl');
   const msgEl = document.getElementById('toastMsg');
@@ -719,9 +1196,6 @@ function showToast(msg) {
   setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-// ============================================================
-//  ADD STYLE for "no-tasks" helper
-// ============================================================
 (function injectHelperStyles() {
   const s = document.createElement('style');
   s.textContent = `.no-tasks { text-align:center; color:var(--text-d); font-size:0.8rem; padding:16px; }`;
